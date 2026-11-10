@@ -13,7 +13,3 @@ pubDate: '2026-11-11'
 - 工作里刚解决的问题
 - 用过觉得不错的工具
 - 一些还没想清楚的想法
-
-## 怎么写新文章
-
-在 `src/content/blog/` 里新建一个 Markdown 文件，开头照着这篇填好 `title`、`description` 和 `pubDate`，下面写正文就行。
