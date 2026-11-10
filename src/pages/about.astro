@@ -5,17 +5,14 @@ const experience = [
 	{
 		period: '2026.05 – 2026.08',
 		place: '字节跳动 · 豆包（飞书）',
-		role: 'AI 应用开发',
 	},
 	{
 		period: '2025.12 – 2026.04',
 		place: 'Karis',
-		role: 'AI 应用开发',
 	},
 	{
 		period: '2025.03 – 2025.07',
 		place: '同花顺',
-		role: 'AI 应用开发',
 	},
 ];
 
@@ -54,7 +51,6 @@ const openSource = [
 				<li>
 					<span class="period">{item.period}</span>
 					<span class="place">{item.place}</span>
-					<span class="role">{item.role}</span>
 				</li>
 			))
 		}
@@ -94,7 +90,7 @@ const openSource = [
 	}
 	.timeline li {
 		display: grid;
-		grid-template-columns: 10.5rem 1fr auto;
+		grid-template-columns: 10.5rem 1fr;
 		gap: 0 1rem;
 		align-items: baseline;
 		padding: 0.7rem 0;
@@ -110,16 +106,9 @@ const openSource = [
 		font-weight: 600;
 		font-size: 1.1rem;
 	}
-	.role {
-		font-size: 0.88rem;
-		color: var(--ink-soft);
-	}
 	@media (max-width: 600px) {
 		.timeline li {
-			grid-template-columns: 1fr auto;
-		}
-		.period {
-			grid-column: 1 / -1;
+			grid-template-columns: 1fr;
 		}
 	}
 	.projects {
