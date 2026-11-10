@@ -32,7 +32,27 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
-<Font cssVariable="--font-atkinson" preload />
+<!-- Apply the saved theme before first paint to avoid a flash -->
+<script is:inline>
+	(() => {
+		let saved = null;
+		try {
+			saved = localStorage.getItem('theme');
+		} catch {}
+		const system = matchMedia('(prefers-color-scheme: dark)');
+		const root = document.documentElement;
+		root.dataset.theme = saved === 'dark' || saved === 'light' ? saved : system.matches ? 'dark' : 'light';
+		system.addEventListener('change', (e) => {
+			let chosen = null;
+			try {
+				chosen = localStorage.getItem('theme');
+			} catch {}
+			if (!chosen) root.dataset.theme = e.matches ? 'dark' : 'light';
+		});
+	})();
+</script>
+
+<Font cssVariable="--font-newsreader" preload />
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />

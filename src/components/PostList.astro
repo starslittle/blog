@@ -1,0 +1,82 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	posts: CollectionEntry<'blog'>[];
+}
+
+const { posts } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+const stamp = (d: Date) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
+---
+
+<ul>
+	{
+		posts.map((post) => (
+			<li>
+				<a href={`/blog/${post.id}/`}>
+					<time datetime={post.data.pubDate.toISOString()}>{stamp(post.data.pubDate)}</time>
+					<span class="text">
+						<span class="title">{post.data.title}</span>
+						<span class="desc">{post.data.description}</span>
+					</span>
+				</a>
+			</li>
+		))
+	}
+</ul>
+<style>
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	li {
+		border-bottom: 1px solid var(--rule);
+	}
+	a {
+		display: grid;
+		grid-template-columns: 6.5rem 1fr;
+		gap: 0 1rem;
+		align-items: baseline;
+		padding: 1.1rem 0;
+		text-decoration: none;
+	}
+	a:hover {
+		color: inherit;
+	}
+	time {
+		font-family: var(--font-mono);
+		font-size: 0.82rem;
+		font-variant-numeric: tabular-nums;
+		color: var(--ink-faint);
+		transition: color 0.15s;
+	}
+	.text {
+		display: block;
+	}
+	.title {
+		display: block;
+		font-family: var(--font-serif);
+		font-weight: 600;
+		font-size: 1.2rem;
+		line-height: 1.4;
+		transition: color 0.15s;
+	}
+	.desc {
+		display: block;
+		margin-top: 0.2rem;
+		font-size: 0.92rem;
+		line-height: 1.6;
+		color: var(--ink-soft);
+	}
+	a:hover .title,
+	a:hover time {
+		color: var(--accent);
+	}
+	@media (max-width: 600px) {
+		a {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

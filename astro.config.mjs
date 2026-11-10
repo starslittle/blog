@@ -10,26 +10,15 @@ export default defineConfig({
 	integrations: [mdx(), sitemap()],
 	fonts: [
 		{
-			provider: fontProviders.local(),
-			name: 'Atkinson',
-			cssVariable: '--font-atkinson',
-			fallbacks: ['sans-serif'],
-			options: {
-				variants: [
-					{
-						src: ['./src/assets/fonts/atkinson-regular.woff'],
-						weight: 400,
-						style: 'normal',
-						display: 'swap',
-					},
-					{
-						src: ['./src/assets/fonts/atkinson-bold.woff'],
-						weight: 700,
-						style: 'normal',
-						display: 'swap',
-					},
-				],
-			},
+			// Latin serif for headings and the site title; Chinese falls back to the
+			// reader's system Songti/Source Han Serif (see --font-serif in global.css).
+			provider: fontProviders.google(),
+			name: 'Newsreader',
+			cssVariable: '--font-newsreader',
+			weights: [400, 600],
+			styles: ['normal', 'italic'],
+			subsets: ['latin'],
+			fallbacks: ['Georgia', 'serif'],
 		},
 	],
 });
