@@ -17,11 +17,11 @@ const posts = (await getCollection('blog'))
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			.hero {
-				padding-block: 1.5rem 3.5rem;
+				padding-block: 1rem 3rem;
 			}
 			.hero h1 {
-				font-size: clamp(2.6rem, 9vw, 4rem);
-				line-height: 1.15;
+				font-size: clamp(2.3rem, 7vw, 3.1rem);
+				line-height: 1.2;
 				letter-spacing: 0.02em;
 				margin-bottom: 1.25rem;
 			}
@@ -31,9 +31,8 @@ const posts = (await getCollection('blog'))
 				color: var(--accent);
 			}
 			.hero p {
-				max-width: 26em;
 				margin: 0;
-				font-size: 1.05rem;
+				font-size: 1.1rem;
 				color: var(--ink-soft);
 			}
 			.more {

@@ -18,7 +18,7 @@
 		-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
 		sans-serif;
 	--font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-	--measure: 40rem;
+	--measure: 46rem;
 }
 /* Dark palette. The header toggle sets data-theme on <html>; without a stored
    choice (or without JS) the reader's system setting decides. Keep both blocks in sync. */
@@ -65,7 +65,7 @@ body {
 	background: var(--bg);
 	color: var(--ink);
 	font-family: var(--font-sans);
-	font-size: 17px;
+	font-size: 18px;
 	line-height: 1.85;
 	overflow-wrap: break-word;
 	-webkit-font-smoothing: antialiased;
@@ -80,7 +80,7 @@ footer {
 }
 main {
 	flex: 1;
-	padding-block: 3.5rem 4rem;
+	padding-block: 3rem 4rem;
 }
 
 h1,
