@@ -6,19 +6,16 @@ const experience = [
 		period: '2026.05 – 2026.08',
 		place: '字节跳动 · 豆包（飞书）',
 		role: 'AI 应用开发',
-		text: '做多维表格 Chatbot 的技能检索：可用的 Skill 越来越多，Agent 容易调错，我做了“先召回候选、再让模型判断意图、最后才注入”的链路，并用正负例评测把效果量化下来。另外设计了错误分级机制，遇到无法自动恢复的业务错误时让 Agent 停下来，而不是在循环里空转。还从零搭了语音填表功能的 Prompt 和端到端评测。',
 	},
 	{
 		period: '2025.12 – 2026.04',
 		place: 'Karis',
 		role: '全栈开发',
-		text: '参与达人营销 Agent 工作台的开发。前端解决流式输出时 Markdown 反复重渲染的问题，做了断线后的续传与去重；后端做了 OAuth2 授权中断后的恢复执行、基于 Redis 的会话任务调度，以及计费的幂等和一致性。',
 	},
 	{
 		period: '2025.03 – 2025.07',
 		place: '同花顺',
 		role: 'AI 应用开发',
-		text: '优化智能投顾助手的 RAG 检索链路：关键词、向量、实体匹配三路召回，用元数据过滤保证主体和时效一致，再做结果融合与重排，让金融写作场景下找到的证据更全、更准。',
 	},
 ];
 
@@ -26,28 +23,27 @@ const openSource = [
 	{
 		name: 'OpenViking',
 		href: 'https://github.com/volcengine/OpenViking',
-		text: '面向 Agent 的上下文数据库，统一管理知识、记忆与技能。我重构了 OpenClaw 插件的记忆自动召回链路，把客户端的三段式拼装改成服务端一次完成的上下文检索。',
+		text: '面向 Agent 的上下文数据库。我重构了其中一个插件的记忆召回链路。',
 	},
 	{
 		name: 'DeerFlow',
 		href: 'https://github.com/bytedance/deer-flow',
-		text: '修复了跨域部署下鉴权失败被误判成“没有数据”的问题，让几种失败状态可区分、可恢复；还把 Memory 的非法配置从运行期暴露提前到启动时直接拒绝。',
+		text: '修了跨域部署下的鉴权问题，以及 Memory 配置的启动期校验。',
 	},
 	{
 		name: 'Resume-Agent',
 		href: 'https://github.com/kkooww77/Resume-Agent',
-		text: '我自己的项目：面向求职场景的 AI 简历生成平台，支持用自然语言生成简历、导入 PDF、在线编辑和导出。导出从前端截图改成了服务端 LaTeX 渲染，文件更小，文字也能选中了。',
+		text: '我自己的项目：用自然语言生成简历的 AI 平台。',
 	},
 ];
 ---
 
 <Layout title="关于" description="Tao 是谁，做过什么，这个博客写什么。">
 	<p class="lead">
-		你好，我是 Tao。杭州电子科技大学计算机技术专业在读硕士，2027
-		年毕业，本科在浙江工商大学读物联网工程。研究方向是智能体在文本与图像上的策略和应用。
+		你好，我是 Tao，做 AI 应用开发，也写全栈。
 	</p>
 	<p>
-		这两年我主要做 AI 应用开发，也写全栈。比起训练模型，我更关心怎么让模型在真实产品里稳定地把事情做完：检索要召回对的东西，Agent
+		比起训练模型，我更关心怎么让模型在真实产品里稳定地把事情做完：检索要召回对的东西，Agent
 		出错了要知道停下来，上线之前要有评测兜底。
 	</p>
 
@@ -56,12 +52,9 @@ const openSource = [
 		{
 			experience.map((item) => (
 				<li>
-					<p class="period">{item.period}</p>
-					<h3>
-						{item.place}
-						<span class="role">{item.role}</span>
-					</h3>
-					<p>{item.text}</p>
+					<span class="period">{item.period}</span>
+					<span class="place">{item.place}</span>
+					<span class="role">{item.role}</span>
 				</li>
 			))
 		}
@@ -101,47 +94,38 @@ const openSource = [
 	.timeline {
 		list-style: none;
 		margin: 0 0 1.2em;
-		padding: 0 0 0 1.5rem;
-		border-left: 1px solid var(--rule);
+		padding: 0;
 		text-align: left;
 	}
 	.timeline li {
-		position: relative;
-		padding-bottom: 1.6rem;
-	}
-	.timeline li:last-child {
-		padding-bottom: 0;
-	}
-	.timeline li::before {
-		content: '';
-		position: absolute;
-		left: calc(-1.5rem - 4px);
-		top: 0.7em;
-		width: 7px;
-		height: 7px;
-		background: var(--accent);
-		border-radius: 1px;
-		transform: rotate(45deg);
+		display: grid;
+		grid-template-columns: 10.5rem 1fr auto;
+		gap: 0 1rem;
+		align-items: baseline;
+		padding: 0.7rem 0;
+		border-bottom: 1px solid var(--rule);
 	}
 	.period {
-		margin: 0;
 		font-family: var(--font-mono);
 		font-size: 0.8rem;
 		color: var(--ink-faint);
 	}
-	.timeline h3 {
-		margin: 0.1rem 0 0.4rem;
+	.place {
+		font-family: var(--font-serif);
+		font-weight: 600;
+		font-size: 1.1rem;
 	}
 	.role {
-		margin-left: 0.6em;
-		font-family: var(--font-sans);
-		font-size: 0.85rem;
-		font-weight: 400;
+		font-size: 0.88rem;
 		color: var(--ink-soft);
 	}
-	.timeline p:last-child {
-		margin: 0;
-		color: var(--ink-soft);
+	@media (max-width: 600px) {
+		.timeline li {
+			grid-template-columns: 1fr auto;
+		}
+		.period {
+			grid-column: 1 / -1;
+		}
 	}
 	.projects {
 		margin: 0 0 1.2em;
