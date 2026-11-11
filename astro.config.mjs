@@ -6,7 +6,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://blog-ten-gamma-11.vercel.app',
+	site: 'https://taotang.me',
 	integrations: [mdx(), sitemap()],
 	fonts: [
 		{
