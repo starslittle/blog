@@ -1,7 +1,9 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
+import { SERIES } from '../../consts';
 import { readingMinutes } from '../../utils/reading-time';
+import { seriesPosts } from '../../utils/series';
 
 export async function getStaticPaths() {
 	// Newest first, the same order as the post list.
@@ -27,6 +29,17 @@ interface Props {
 
 const { post, prev, next } = Astro.props;
 const { Content, headings } = await render(post);
+
+const seriesId = post.data.series;
+const series = seriesId && {
+	title: SERIES[seriesId].title,
+	href: `/series/${seriesId}/`,
+	parts: (await seriesPosts(seriesId)).map((p) => ({
+		title: p.data.title,
+		href: `/blog/${p.id}/`,
+		current: p.id === post.id,
+	})),
+};
 ---
 
 <BlogPost
@@ -34,8 +47,10 @@ const { Content, headings } = await render(post);
 	headings={headings}
 	minutes={readingMinutes(post.body ?? '')}
 	ogImage={`/og/${post.id}.png`}
+	seriesInfo={series || undefined}
 	prev={prev}
 	next={next}
 >
 	<Content />
 </BlogPost>
+

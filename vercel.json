@@ -13,6 +13,15 @@
           "value": "inline; filename=\"resume.pdf\""
         }
       ]
+    },
+    {
+      "source": "/giscus-(.*).css",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://giscus.app"
+        }
+      ]
     }
   ]
 }

@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { SERIES, type SeriesId } from './consts';
 
 const blog = defineCollection({
 	// Load Markdown and MDX files in the `src/content/blog/` directory.
@@ -14,6 +15,9 @@ const blog = defineCollection({
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: z.optional(image()),
+			// Optional series membership; seriesOrder sets the reading order inside it.
+			series: z.enum(Object.keys(SERIES) as [SeriesId, ...SeriesId[]]).optional(),
+			seriesOrder: z.number().int().positive().optional(),
 		}),
 });
 

@@ -2,6 +2,8 @@
 title: '在 Claude Code 里调用 Codex：官方插件怎么装、怎么用'
 description: 'OpenAI 出了一个装进 Claude Code 的 Codex 插件。装好以后，可以让 Claude 写代码、Codex 来审查，不用来回切窗口。这篇讲怎么装、怎么用，以及几个容易踩的坑。'
 pubDate: '2026-11-18'
+series: claude
+seriesOrder: 3
 ---
 
 我平时 Claude Code 和 Codex 都用。最常见的配合是：**Claude 写代码，Codex 来审查。**

@@ -1,0 +1,92 @@
+---
+// One page per series: /series/<id>/, posts in reading order.
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import { SERIES, SITE_TITLE, type SeriesId } from '../../consts';
+import { seriesPosts } from '../../utils/series';
+
+export function getStaticPaths() {
+	return (Object.keys(SERIES) as SeriesId[]).map((id) => ({ params: { id } }));
+}
+
+const id = Astro.params.id as SeriesId;
+const series = SERIES[id];
+const posts = await seriesPosts(id);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`${series.title} | ${SITE_TITLE}`} description={series.description} />
+		<style>
+			.intro {
+				margin-bottom: 2.25rem;
+				color: var(--ink-soft);
+			}
+			ol {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				counter-reset: part;
+			}
+			li {
+				counter-increment: part;
+				border-top: 1px solid var(--rule);
+			}
+			li:last-child {
+				border-bottom: 1px solid var(--rule);
+			}
+			a {
+				display: grid;
+				grid-template-columns: 2.5rem 1fr;
+				gap: 0.25rem 1rem;
+				padding: 1.2rem 0;
+				text-decoration: none;
+			}
+			a::before {
+				content: counter(part, decimal-leading-zero);
+				grid-row: span 2;
+				font-family: var(--font-serif);
+				font-size: 1.5rem;
+				line-height: 1.2;
+				color: var(--accent);
+			}
+			.title {
+				font-family: var(--font-serif);
+				font-size: 1.15rem;
+				font-weight: 600;
+				line-height: 1.4;
+			}
+			a:hover .title {
+				color: var(--accent);
+			}
+			.desc {
+				font-size: 0.92rem;
+				line-height: 1.7;
+				color: var(--ink-faint);
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<p class="eyebrow">系列 · 共 {posts.length} 篇</p>
+			<h1>{series.title}</h1>
+			<p class="intro">{series.description}建议按顺序读。</p>
+			<ol>
+				{
+					posts.map((post) => (
+						<li>
+							<a href={`/blog/${post.id}/`}>
+								<span class="title">{post.data.title}</span>
+								<span class="desc">{post.data.description}</span>
+							</a>
+						</li>
+					))
+				}
+			</ol>
+		</main>
+		<Footer />
+	</body>
+</html>

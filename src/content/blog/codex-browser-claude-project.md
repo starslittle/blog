@@ -2,6 +2,8 @@
 title: 'Codex 管网页，Claude 管项目：我现在的分工'
 description: 'Codex 和 Claude Code 我都在用，用久了发现它们各有擅长：要在网页上替我点点按按，我找 Codex；要在项目里写代码、守规矩，我找 Claude。这篇用两个真实例子讲讲为什么。'
 pubDate: '2026-11-18'
+series: claude
+seriesOrder: 4
 ---
 
 Codex 和 Claude Code 我每天都用。用了一段时间，我形成了一个很简单的分工：

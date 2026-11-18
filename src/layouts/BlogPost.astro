@@ -7,15 +7,19 @@ import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import ShareButtons from '../components/ShareButtons.astro';
+import Comments from '../components/Comments.astro';
 import { SITE_TITLE } from '../consts';
 
 type Link = { href: string; title: string };
+type Series = { title: string; href: string; parts: (Link & { current: boolean })[] };
 type Props = Omit<CollectionEntry<'blog'>['data'], 'pubDate'> & {
 	pubDate?: Date;
 	headings?: MarkdownHeading[];
 	minutes?: number;
 	/** Share card path; pages without one (like 关于) use the site card. */
 	ogImage?: string;
+	/** Named seriesInfo so it isn't confused with the `series` id in the frontmatter. */
+	seriesInfo?: Series;
 	prev?: Link;
 	next?: Link;
 };
@@ -29,11 +33,13 @@ const {
 	headings = [],
 	minutes,
 	ogImage,
+	seriesInfo: series,
 	prev,
 	next,
 } =
 	Astro.props;
 
+const seriesIndex = series ? series.parts.findIndex((p) => p.current) + 1 : 0;
 const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
 
 // Only h2/h3 go in the table of contents, and only when there are enough to help.
@@ -150,6 +156,98 @@ const showToc = toc.length >= 3;
 				}
 			}
 
+			/* Reading progress along the top edge, and a back-to-top button. */
+			.progress {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 20;
+				height: 2px;
+				background: var(--accent);
+				transform: scaleX(0);
+				transform-origin: left;
+				pointer-events: none;
+			}
+			.to-top {
+				position: fixed;
+				right: max(1.25rem, env(safe-area-inset-right));
+				bottom: max(1.25rem, env(safe-area-inset-bottom));
+				z-index: 20;
+				display: grid;
+				place-items: center;
+				width: 2.75rem;
+				height: 2.75rem;
+				padding: 0;
+				border: 1px solid var(--rule);
+				border-radius: 50%;
+				background: var(--bg);
+				color: var(--ink-soft);
+				cursor: pointer;
+				box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
+				opacity: 0;
+				visibility: hidden;
+				transform: translateY(8px);
+				transition:
+					opacity 0.2s,
+					transform 0.2s,
+					visibility 0.2s,
+					color 0.15s,
+					border-color 0.15s;
+			}
+			.to-top.show {
+				opacity: 1;
+				visibility: visible;
+				transform: none;
+			}
+			.to-top:hover {
+				color: var(--accent);
+				border-color: var(--accent);
+			}
+			.to-top svg {
+				width: 1.1rem;
+				height: 1.1rem;
+			}
+
+			/* Series box under the title */
+			.series {
+				margin: 0 0 1.25rem;
+				padding: 0.85rem 1.1rem;
+				border: 1px solid var(--rule);
+				border-left: 3px solid var(--accent);
+				border-radius: 8px;
+				font-size: 0.9rem;
+			}
+			.series summary {
+				cursor: pointer;
+				color: var(--ink-soft);
+			}
+			.series summary a {
+				font-weight: 600;
+			}
+			.series ol {
+				margin: 0.6rem 0 0.1rem;
+				padding-left: 1.4em;
+				line-height: 1.6;
+			}
+			.series li {
+				padding: 0.15rem 0;
+			}
+			.series li::marker {
+				color: var(--ink-faint);
+			}
+			.series li a {
+				text-decoration: none;
+				color: var(--ink-soft);
+			}
+			.series li a:hover {
+				color: var(--accent);
+			}
+			.series li.current {
+				color: var(--ink);
+				font-weight: 600;
+			}
+
 			/* Older / newer post */
 			.pager {
 				display: grid;
@@ -229,6 +327,26 @@ const showToc = toc.length >= 3;
 					)
 				}
 				{
+					series && (
+						<details class="series">
+							<summary>
+								系列 <a href={series.href}>{series.title}</a> · 第 {seriesIndex} / {series.parts.length} 篇
+							</summary>
+							<ol>
+								{series.parts.map((p) =>
+									p.current ? (
+										<li class="current" aria-current="page">{p.title}</li>
+									) : (
+										<li>
+											<a href={p.href}>{p.title}</a>
+										</li>
+									),
+								)}
+							</ol>
+						</details>
+					)
+				}
+				{
 					showToc && (
 						<details class="toc-inline">
 							<summary>目录</summary>
@@ -265,6 +383,7 @@ const showToc = toc.length >= 3;
 					)
 				}
 				{pubDate && <p class="back"><a href="/blog">← 全部文章</a></p>}
+				{pubDate && <Comments />}
 				{
 					showToc && (
 						<aside class="toc-side">
@@ -284,6 +403,38 @@ const showToc = toc.length >= 3;
 			</article>
 		</main>
 		<Footer />
+		{
+			pubDate && (
+				<>
+					<div class="progress" aria-hidden="true" />
+					<button type="button" class="to-top" aria-label="回到顶部">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path
+								d="M12 19V5M5 12l7-7 7 7"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+					</button>
+					<script>
+						const bar = document.querySelector<HTMLElement>('.progress')!;
+						const top = document.querySelector<HTMLButtonElement>('.to-top')!;
+						const onScroll = () => {
+							const max = document.documentElement.scrollHeight - innerHeight;
+							bar.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
+							top.classList.toggle('show', scrollY > innerHeight * 1.2);
+						};
+						addEventListener('scroll', onScroll, { passive: true });
+						addEventListener('resize', onScroll, { passive: true });
+						onScroll();
+						top.addEventListener('click', () => scrollTo({ top: 0 }));
+					</script>
+				</>
+			)
+		}
 		{
 			showToc && (
 				<script>

@@ -1,7 +1,10 @@
 ---
-// Share row at the end of a post: copy link, post to X, and a WeChat QR code.
-// Web pages can't open WeChat's share sheet, so the WeChat button shows a QR code
-// (drawn at build time) for the reader to scan with WeChat.
+// Share row at the end of a post: copy link, post to X, and WeChat.
+// A web page can't open WeChat's share sheet itself, so the WeChat button does
+// what works on each device:
+//   - inside WeChat's own browser: point at the ··· menu in the top-right corner
+//   - on a phone: open the system share sheet (WeChat is listed there), or copy the link
+//   - on a computer: show a QR code (drawn at build time) to scan with WeChat
 import QRCode from 'qrcode';
 
 interface Props {
@@ -42,7 +45,7 @@ const qrSvg = await QRCode.toString(url, {
 		>
 		<span>X</span>
 	</a>
-	<button type="button" class="btn" popovertarget="share-wechat">
+	<button type="button" class="btn wechat" data-title={title} data-url={url}>
 		<svg viewBox="0 0 24 24" aria-hidden="true"
 			><path
 				d="M9 4C5.1 4 2 6.6 2 9.8c0 1.8 1 3.4 2.6 4.5L4 16.5l2.5-1.3c.8.2 1.6.4 2.5.4h.4M15.5 9.5c-3.6 0-6.5 2.3-6.5 5.2s2.9 5.2 6.5 5.2c.7 0 1.4-.1 2-.3l2.2 1.2-.5-2c1.7-1 2.8-2.5 2.8-4.1 0-2.9-2.9-5.2-6.5-5.2Z"
@@ -57,11 +60,29 @@ const qrSvg = await QRCode.toString(url, {
 
 <div id="share-wechat" class="qr-card" popover>
 	<div class="qr" set:html={qrSvg} />
-	<p>用微信扫一扫<br />打开后就能转发给朋友</p>
+	<p>打开手机微信，扫一扫<br />打开后点右上角 ··· 就能转发</p>
 	<button type="button" class="close" popovertarget="share-wechat" popovertargetaction="hide">
 		关闭
 	</button>
 </div>
+
+<div id="share-wechat-guide" class="guide" popover>
+	<svg class="arrow" viewBox="0 0 80 90" aria-hidden="true"
+		><path
+			d="M10 85C14 50 34 26 66 14M66 14 48 10M66 14 60 31"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="3"
+			stroke-linecap="round"
+			stroke-linejoin="round"></path></svg
+	>
+	<p>点右上角 <b>···</b><br />选「发送给朋友」或「分享到朋友圈」</p>
+	<button type="button" class="close" popovertarget="share-wechat-guide" popovertargetaction="hide">
+		知道了
+	</button>
+</div>
+
+<div id="share-toast" class="toast" popover="manual" role="status"></div>
 
 <style>
 	.share {
@@ -147,6 +168,55 @@ const qrSvg = await QRCode.toString(url, {
 		line-height: 1.6;
 		color: var(--ink-soft);
 	}
+	/* Inside WeChat: dim the page and point at the ··· menu. */
+	.guide {
+		inset: 0;
+		width: 100%;
+		max-width: none;
+		height: 100%;
+		max-height: none;
+		margin: 0;
+		padding: 1rem 1.5rem;
+		border: none;
+		background: rgb(20 16 12 / 0.82);
+		color: #fbf7ee;
+		text-align: right;
+	}
+	.guide::backdrop {
+		background: transparent;
+	}
+	.guide .arrow {
+		display: block;
+		width: 4.5rem;
+		/* Points up and to the right, at WeChat's ··· menu. */
+		margin: 0 -0.25rem 0.5rem auto;
+		color: #fbf7ee;
+	}
+	.guide p {
+		margin: 0 0 1.25rem;
+		font-size: 1.15rem;
+		line-height: 1.8;
+	}
+	.guide .close {
+		border-color: rgb(251 247 238 / 0.5);
+		color: #fbf7ee;
+	}
+
+	/* Short message at the bottom, e.g. after copying the link on a phone. */
+	.toast {
+		inset: auto 0 max(2rem, env(safe-area-inset-bottom)) 0;
+		width: max-content;
+		max-width: calc(100vw - 2.5rem);
+		margin: 0 auto;
+		padding: 0.6rem 1.1rem;
+		border: none;
+		border-radius: 999px;
+		background: var(--ink);
+		color: var(--bg);
+		font-size: 0.9rem;
+		line-height: 1.5;
+	}
+
 	.close {
 		padding: 0.3rem 1rem;
 		border: 1px solid var(--rule);
@@ -181,18 +251,55 @@ const qrSvg = await QRCode.toString(url, {
 		return ok;
 	}
 
+	async function copyText(text: string): Promise<boolean> {
+		try {
+			await navigator.clipboard.writeText(text);
+			return true;
+		} catch {
+			return legacyCopy(text);
+		}
+	}
+
+	let toastTimer = 0;
+	function toast(message: string) {
+		const el = document.getElementById('share-toast')!;
+		el.textContent = message;
+		el.showPopover?.();
+		clearTimeout(toastTimer);
+		toastTimer = window.setTimeout(() => el.hidePopover?.(), 2600);
+	}
+
+	const inWeChat = /MicroMessenger/i.test(navigator.userAgent);
+	const isPhone = matchMedia('(pointer: coarse)').matches;
+
+	for (const btn of document.querySelectorAll<HTMLButtonElement>('.share .wechat')) {
+		btn.addEventListener('click', async () => {
+			const { title, url } = btn.dataset as { title: string; url: string };
+			if (inWeChat) {
+				document.getElementById('share-wechat-guide')!.showPopover();
+				return;
+			}
+			if (isPhone) {
+				if (navigator.share) {
+					try {
+						await navigator.share({ title, url });
+					} catch {
+						// Reader closed the share sheet: nothing to do.
+					}
+					return;
+				}
+				toast((await copyText(url)) ? '链接已复制，打开微信粘贴给朋友' : url);
+				return;
+			}
+			document.getElementById('share-wechat')!.showPopover();
+		});
+	}
+
 	for (const btn of document.querySelectorAll<HTMLButtonElement>('.share .copy')) {
 		const text = btn.querySelector('.text')!;
 		btn.addEventListener('click', async () => {
 			const url = btn.dataset.url!;
-			let copied = false;
-			try {
-				await navigator.clipboard.writeText(url);
-				copied = true;
-			} catch {
-				copied = legacyCopy(url);
-			}
-			if (!copied) {
+			if (!(await copyText(url))) {
 				prompt('复制这个链接：', url);
 				return;
 			}

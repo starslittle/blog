@@ -1,0 +1,65 @@
+---
+// Comments under each post, stored as GitHub Discussions in starslittle/blog via giscus.
+// Readers sign in with GitHub to comment. The iframe loads only when it scrolls near.
+import { GISCUS } from '../consts';
+---
+
+{
+	GISCUS.enabled && (
+		<section class="comments" aria-label="评论">
+			<p class="eyebrow">评论</p>
+			<div
+				class="giscus-mount"
+				data-repo={GISCUS.repo}
+				data-repo-id={GISCUS.repoId}
+				data-category={GISCUS.category}
+				data-category-id={GISCUS.categoryId}
+			/>
+		</section>
+	)
+}
+
+<style>
+	.comments {
+		margin-top: 3.5rem;
+	}
+	.giscus-mount {
+		min-height: 12rem;
+	}
+</style>
+
+<script>
+	const mount = document.querySelector<HTMLElement>('.giscus-mount');
+	if (mount) {
+		// Our own paper-coloured themes (public/giscus-*.css), following the site's toggle.
+		const theme = () =>
+			`${location.origin}/giscus-${document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'}.css`;
+
+		const s = document.createElement('script');
+		s.src = 'https://giscus.app/client.js';
+		s.async = true;
+		s.crossOrigin = 'anonymous';
+		const attrs: Record<string, string> = {
+			'data-repo': mount.dataset.repo!,
+			'data-repo-id': mount.dataset.repoId!,
+			'data-category': mount.dataset.category!,
+			'data-category-id': mount.dataset.categoryId!,
+			'data-mapping': 'pathname',
+			'data-strict': '1',
+			'data-reactions-enabled': '1',
+			'data-emit-metadata': '0',
+			'data-input-position': 'bottom',
+			'data-theme': theme(),
+			'data-lang': 'zh-CN',
+			'data-loading': 'lazy',
+		};
+		for (const [k, v] of Object.entries(attrs)) s.setAttribute(k, v);
+		mount.append(s);
+
+		// When the reader flips light/dark, tell the giscus iframe to switch too.
+		new MutationObserver(() => {
+			const frame = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+			frame?.contentWindow?.postMessage({ giscus: { setConfig: { theme: theme() } } }, 'https://giscus.app');
+		}).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+	}
+</script>

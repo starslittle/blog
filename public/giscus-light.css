@@ -1,0 +1,33 @@
+/* Giscus comment box in the blog's paper palette (light). Loaded by giscus inside its
+   iframe; starts from giscus's own light theme and swaps in the site colours. */
+@import url('https://giscus.app/themes/light.css');
+
+main {
+	--color-canvas-default: #f7f3ea;
+	--color-canvas-subtle: #eee8da;
+	--color-canvas-overlay: #f7f3ea;
+	--color-canvas-inset: #eee8da;
+	--color-fg-default: #1f1b16;
+	--color-fg-muted: #5c554a;
+	--color-fg-subtle: #8f8677;
+	--color-border-default: #dcd4c2;
+	--color-border-muted: #dcd4c2;
+	--color-neutral-muted: rgb(143 134 119 / 0.2);
+	--color-accent-fg: #c23b22;
+	--color-accent-emphasis: #c23b22;
+	--color-btn-text: #1f1b16;
+	--color-btn-bg: #eee8da;
+	--color-btn-border: #dcd4c2;
+	--color-btn-hover-bg: #e6dfce;
+	--color-btn-hover-border: #c9bfa9;
+	--color-btn-primary-text: #fbf7ee;
+	--color-btn-primary-bg: #c23b22;
+	--color-btn-primary-border: #c23b22;
+	--color-btn-primary-hover-bg: #a83119;
+	--color-btn-primary-hover-border: #a83119;
+	--color-btn-primary-disabled-text: rgb(251 247 238 / 0.8);
+	--color-btn-primary-disabled-bg: #d98a7b;
+	--color-segmented-control-bg: #eee8da;
+	--color-segmented-control-button-bg: #f7f3ea;
+	--color-primer-shadow-inset: none;
+}
