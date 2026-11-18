@@ -64,11 +64,11 @@ const showToc = toc.length >= 3;
 				position: relative;
 			}
 			article {
-				max-width: var(--measure);
+				max-width: var(--read);
 				margin-inline: auto;
 			}
 			/* With room for the TOC column, line the text up with the header's left edge. */
-			@media (min-width: 66rem) {
+			@media (min-width: 60rem) {
 				article {
 					margin-left: 0;
 				}
@@ -177,7 +177,7 @@ const showToc = toc.length >= 3;
 			.toc-side {
 				display: none;
 			}
-			@media (min-width: 66rem) {
+			@media (min-width: 60rem) {
 				.toc-inline {
 					display: none;
 				}

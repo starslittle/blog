@@ -28,7 +28,8 @@
 		-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
 		sans-serif;
 	--font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-	--measure: 46rem; /* comfortable line length for reading */
+	--measure: 46rem; /* width for lists and summaries */
+	--read: 40rem; /* article text: about 35 Chinese characters a line at 18px */
 	--frame: 72rem; /* outer width shared by header, page body and footer */
 }
 /* Dark palette. The header toggle sets data-theme on <html>; without a stored
@@ -166,8 +167,10 @@ hr {
 }
 
 /* Article body */
+/* Left-aligned: justifying mixed Chinese and English stretches spaces and splits
+   long English words across lines. */
 .prose {
-	text-align: justify;
+	text-align: start;
 }
 .prose :is(h2, h3) {
 	scroll-margin-top: 1.5rem;
@@ -177,13 +180,8 @@ hr {
 	font-size: 1.55rem;
 	text-align: left;
 }
-/* Bold reads as a light highlighter stroke, not a heavy black block. */
 .prose strong {
 	font-weight: 600;
-	background: linear-gradient(
-		transparent 62%,
-		color-mix(in srgb, var(--accent) 18%, transparent) 62%
-	);
 }
 .prose h3 {
 	margin-top: 1.8em;
@@ -194,6 +192,10 @@ hr {
 	padding-left: 1.4em;
 	margin: 0 0 1.2em;
 	text-align: left;
+}
+/* List items are often two or three lines long: give them room to breathe. */
+.prose li + li {
+	margin-top: 0.5em;
 }
 .prose li::marker {
 	color: var(--accent);
