@@ -59,8 +59,11 @@ const showToc = toc.length >= 3;
 			type={pubDate ? 'article' : 'website'}
 		/>
 		<style>
-			article {
+			/* The TOC column is placed against the page frame (main), not the text. */
+			.post {
 				position: relative;
+			}
+			article {
 				max-width: var(--measure);
 				margin-inline: auto;
 			}
@@ -180,11 +183,13 @@ const showToc = toc.length >= 3;
 				}
 				.toc-side {
 					display: block;
+					/* Right edge lines up with the header nav; spans the text's height so the
+					   sticky list inside can follow the reader down the page. */
 					position: absolute;
-					top: 0;
-					bottom: 0;
-					left: calc(100% + 3.5rem);
-					width: min(13rem, calc(100vw - var(--measure) - 7.5rem));
+					top: 3rem;
+					bottom: 4rem;
+					right: 1.25rem;
+					width: 13rem;
 				}
 				.toc-side nav {
 					position: sticky;
@@ -317,7 +322,7 @@ const showToc = toc.length >= 3;
 
 	<body>
 		<Header />
-		<main>
+		<main class="post">
 			<article>
 				<div class="title">
 					{
