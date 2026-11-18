@@ -4,7 +4,6 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
-import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import ShareButtons from '../components/ShareButtons.astro';
 import Comments from '../components/Comments.astro';
@@ -40,6 +39,9 @@ const {
 	Astro.props;
 
 const seriesIndex = series ? series.parts.findIndex((p) => p.current) + 1 : 0;
+const CN = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+const pad = (n: number) => String(n).padStart(2, '0');
+const stamp = (d: Date) => `${d.getUTCFullYear()}.${pad(d.getUTCMonth() + 1)}.${pad(d.getUTCDate())}`;
 const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
 
 // Only h2/h3 go in the table of contents, and only when there are enough to help.
@@ -60,19 +62,48 @@ const showToc = toc.length >= 3;
 			article {
 				position: relative;
 			}
+			.title {
+				margin-bottom: 2.75rem;
+			}
+			.kicker {
+				margin: 0 0 1rem;
+				font-size: 0.85rem;
+				letter-spacing: 0.2em;
+				color: var(--accent);
+			}
+			.kicker a {
+				text-decoration: none;
+			}
+			.kicker a:hover {
+				text-decoration: underline;
+			}
+			.title h1 {
+				margin: 0 0 1.1rem;
+				font-size: clamp(2.1rem, 5.5vw, 3rem);
+				line-height: 1.3;
+			}
 			.meta {
-				margin: 0 0 0.75rem;
+				display: flex;
+				flex-wrap: wrap;
+				align-items: baseline;
+				gap: 0.3rem 1.2rem;
+				margin: 0;
 				font-size: 0.88rem;
 				color: var(--ink-faint);
 			}
-			.title {
-				margin-bottom: 2.5rem;
-				padding-bottom: 1.75rem;
-				border-bottom: 1px solid var(--rule);
+			.meta time {
+				font-family: var(--font-newsreader), Georgia, serif;
+				font-style: italic;
+				font-size: 1.02rem;
 			}
-			.title h1 {
-				margin: 0;
-				font-size: clamp(2rem, 6vw, 2.75rem);
+			/* A short red rule closing the title block, instead of a full-width line */
+			.title::after {
+				content: '';
+				display: block;
+				width: 2.5rem;
+				height: 2px;
+				margin-top: 1.6rem;
+				background: var(--accent);
 			}
 			.hero-image img {
 				display: block;
@@ -121,9 +152,8 @@ const showToc = toc.length >= 3;
 
 			.toc-inline {
 				margin: 0 0 2.25rem;
-				padding: 0.85rem 1.1rem;
-				background: var(--surface);
-				border-radius: 8px;
+				padding: 0.1rem 0 0.1rem 1rem;
+				border-left: 2px solid var(--rule);
 			}
 			.toc-inline summary {
 				cursor: pointer;
@@ -176,15 +206,14 @@ const showToc = toc.length >= 3;
 				z-index: 20;
 				display: grid;
 				place-items: center;
-				width: 2.75rem;
-				height: 2.75rem;
+				width: 2.4rem;
+				height: 2.4rem;
 				padding: 0;
 				border: 1px solid var(--rule);
-				border-radius: 50%;
+				border-radius: 4px;
 				background: var(--bg);
 				color: var(--ink-soft);
 				cursor: pointer;
-				box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
 				opacity: 0;
 				visibility: hidden;
 				transform: translateY(8px);
@@ -209,66 +238,39 @@ const showToc = toc.length >= 3;
 				height: 1.1rem;
 			}
 
-			/* Series box under the title */
-			.series {
-				margin: 0 0 1.25rem;
-				padding: 0.85rem 1.1rem;
-				border: 1px solid var(--rule);
-				border-left: 3px solid var(--accent);
-				border-radius: 8px;
-				font-size: 0.9rem;
+			/* End of text: a small seal, the way old books close a chapter */
+			.fin {
+				margin: 3rem 0 0;
+				text-align: center;
 			}
-			.series summary {
-				cursor: pointer;
-				color: var(--ink-soft);
-			}
-			.series summary a {
-				font-weight: 600;
-			}
-			.series ol {
-				margin: 0.6rem 0 0.1rem;
-				padding-left: 1.4em;
-				line-height: 1.6;
-			}
-			.series li {
-				padding: 0.15rem 0;
-			}
-			.series li::marker {
-				color: var(--ink-faint);
-			}
-			.series li a {
-				text-decoration: none;
-				color: var(--ink-soft);
-			}
-			.series li a:hover {
-				color: var(--accent);
-			}
-			.series li.current {
-				color: var(--ink);
-				font-weight: 600;
+			.fin span {
+				display: inline-grid;
+				place-items: center;
+				width: 1.9rem;
+				height: 1.9rem;
+				border-radius: 5px 3px 6px 4px;
+				background: var(--accent);
+				color: var(--on-accent);
+				font-family: 'Display SC', var(--font-serif);
+				font-weight: 900;
+				font-size: 1.25rem;
+				line-height: 1;
+				transform: rotate(-6deg);
 			}
 
-			/* Older / newer post */
+			/* Older / newer post: two plain links under a rule */
 			.pager {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
-				gap: 1rem;
-				margin: 2rem 0 0;
-				padding-top: 1.75rem;
+				gap: 1.5rem;
+				margin: 2.5rem 0 0;
+				padding-top: 1.4rem;
 				border-top: 1px solid var(--rule);
 			}
 			.pager a {
 				display: block;
-				padding: 0.9rem 1.1rem;
-				border: 1px solid var(--rule);
-				border-radius: 8px;
 				text-decoration: none;
-				line-height: 1.5;
-				transition: border-color 0.15s;
-			}
-			.pager a:hover {
-				border-color: var(--accent);
-				color: inherit;
+				line-height: 1.55;
 			}
 			.pager .newer {
 				grid-column: 2;
@@ -276,13 +278,18 @@ const showToc = toc.length >= 3;
 			}
 			.pager small {
 				display: block;
-				margin-bottom: 0.3rem;
+				margin-bottom: 0.25rem;
 				font-size: 0.8rem;
+				letter-spacing: 0.1em;
 				color: var(--ink-faint);
 			}
 			.pager span {
 				font-family: var(--font-serif);
 				font-weight: 600;
+				transition: color 0.2s;
+			}
+			.pager a:hover span {
+				color: var(--accent);
 			}
 			@media (max-width: 600px) {
 				.pager {
@@ -290,6 +297,7 @@ const showToc = toc.length >= 3;
 				}
 				.pager .newer {
 					grid-column: auto;
+					text-align: left;
 				}
 			}
 			.back {
@@ -306,44 +314,33 @@ const showToc = toc.length >= 3;
 				<div class="title">
 					{
 						pubDate && (
-							<p class="meta">
-								<FormattedDate date={pubDate} />
-								{minutes && <span>　·　约 {minutes} 分钟读完</span>}
-								{updatedDate && (
-									<span>
-										　·　最后更新于 <FormattedDate date={updatedDate} />
-									</span>
+							<p class="kicker">
+								{series ? (
+									<a href={series.href}>
+										{series.title} · 第{CN[seriesIndex] ?? seriesIndex}篇
+									</a>
+								) : (
+									'碎碎念'
 								)}
 							</p>
 						)
 					}
 					<h1>{title}</h1>
+					{
+						pubDate && (
+							<p class="meta">
+								<time datetime={pubDate.toISOString()}>{stamp(pubDate)}</time>
+								{minutes && <span>约 {minutes} 分钟</span>}
+								{updatedDate && <span>改于 {stamp(updatedDate)}</span>}
+							</p>
+						)
+					}
 				</div>
 				{
 					heroImage && (
 						<div class="hero-image">
 							<Image width={1280} height={640} src={heroImage} alt="" />
 						</div>
-					)
-				}
-				{
-					series && (
-						<details class="series">
-							<summary>
-								系列 <a href={series.href}>{series.title}</a> · 第 {seriesIndex} / {series.parts.length} 篇
-							</summary>
-							<ol>
-								{series.parts.map((p) =>
-									p.current ? (
-										<li class="current" aria-current="page">{p.title}</li>
-									) : (
-										<li>
-											<a href={p.href}>{p.title}</a>
-										</li>
-									),
-								)}
-							</ol>
-						</details>
 					)
 				}
 				{
@@ -363,6 +360,13 @@ const showToc = toc.length >= 3;
 				<div class="prose">
 					<slot />
 				</div>
+				{
+					pubDate && (
+						<p class="fin" aria-hidden="true">
+							<span>念</span>
+						</p>
+					)
+				}
 				{pubDate && <ShareButtons title={title} url={pageUrl} />}
 				{
 					(prev || next) && (

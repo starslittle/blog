@@ -172,18 +172,17 @@ hr {
 	scroll-margin-top: 1.5rem;
 }
 .prose h2 {
-	margin-top: 2.2em;
+	margin-top: 2.4em;
+	font-size: 1.55rem;
 	text-align: left;
 }
-.prose h2::before {
-	content: '';
-	display: inline-block;
-	width: 0.45em;
-	height: 0.45em;
-	margin-right: 0.5em;
-	background: var(--accent);
-	border-radius: 1px;
-	transform: translateY(-0.15em) rotate(45deg);
+/* Bold reads as a light highlighter stroke, not a heavy black block. */
+.prose strong {
+	font-weight: 600;
+	background: linear-gradient(
+		transparent 62%,
+		color-mix(in srgb, var(--accent) 18%, transparent) 62%
+	);
 }
 .prose h3 {
 	margin-top: 1.8em;
