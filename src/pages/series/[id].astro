@@ -20,9 +20,8 @@ const posts = await seriesPosts(id);
 	<head>
 		<BaseHead title={`${series.title} | ${SITE_TITLE}`} description={series.description} />
 		<style>
-			.intro {
-				margin-bottom: 2.25rem;
-				color: var(--ink-soft);
+			h1 {
+				margin-bottom: 2rem;
 			}
 			ol {
 				list-style: none;
@@ -73,7 +72,6 @@ const posts = await seriesPosts(id);
 		<main>
 			<p class="eyebrow">系列 · 共 {posts.length} 篇</p>
 			<h1>{series.title}</h1>
-			<p class="intro">{series.description}建议按顺序读。</p>
 			<ol>
 				{
 					posts.map((post) => (

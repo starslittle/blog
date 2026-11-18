@@ -48,12 +48,6 @@ const series = (Object.keys(SERIES) as SeriesId[])
 				font-family: var(--font-serif);
 				font-size: 1.15rem;
 			}
-			.series-card span {
-				display: block;
-				margin-top: 0.2rem;
-				font-size: 0.9rem;
-				color: var(--ink-soft);
-			}
 			.count {
 				margin-bottom: 2rem;
 				color: var(--ink-faint);
@@ -72,7 +66,6 @@ const series = (Object.keys(SERIES) as SeriesId[])
 							<a class="series-card" href={`/series/${s.id}/`}>
 								<small>系列 · {s.count} 篇</small>
 								<strong>{s.title} →</strong>
-								<span>{s.description}</span>
 							</a>
 						))}
 					</div>
