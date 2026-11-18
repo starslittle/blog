@@ -61,6 +61,7 @@ const openSource = [
 
 			/* A short statement, set larger, with a red rule */
 			.statement {
+				max-width: var(--measure);
 				margin: 2.5rem 0 0;
 				padding-left: 1.3rem;
 				border-left: 3px solid var(--accent);
@@ -72,6 +73,18 @@ const openSource = [
 
 			.block {
 				margin-top: 3.5rem;
+				max-width: var(--measure);
+			}
+			/* Past work and projects side by side on wide screens */
+			.cols {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr);
+				column-gap: 4rem;
+			}
+			@media (min-width: 60rem) {
+				.cols {
+					grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+				}
 			}
 			.block h2 {
 				display: flex;
@@ -215,39 +228,41 @@ const openSource = [
 				出错了要知道停下来，上线之前要有评测兜底。
 			</p>
 
-			<section class="block">
-				<h2><i>01</i>做过的事</h2>
-				<ol class="timeline">
-					{
-						experience.map((item) => (
-							<li>
-								<span class="period">{item.period}</span>
-								<span class="place">{item.place}</span>
-							</li>
-						))
-					}
-				</ol>
-			</section>
+			<div class="cols">
+				<section class="block">
+					<h2><i>01</i>做过的事</h2>
+					<ol class="timeline">
+						{
+							experience.map((item) => (
+								<li>
+									<span class="period">{item.period}</span>
+									<span class="place">{item.place}</span>
+								</li>
+							))
+						}
+					</ol>
+				</section>
 
-			<section class="block">
-				<h2><i>02</i>开源与项目</h2>
-				<p>我喜欢在用到的开源项目里顺手修问题，也自己做点东西。</p>
-				<ul class="projects">
-					{
-						openSource.map((item) => (
-							<li>
-								<a href={item.href} target="_blank" rel="noopener">
-									<span class="pname">
-										{item.name}
-										<span aria-hidden="true">↗</span>
-									</span>
-									<span class="ptext">{item.text}</span>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
+				<section class="block">
+					<h2><i>02</i>开源与项目</h2>
+					<p>我喜欢在用到的开源项目里顺手修问题，也自己做点东西。</p>
+					<ul class="projects">
+						{
+							openSource.map((item) => (
+								<li>
+									<a href={item.href} target="_blank" rel="noopener">
+										<span class="pname">
+											{item.name}
+											<span aria-hidden="true">↗</span>
+										</span>
+										<span class="ptext">{item.text}</span>
+									</a>
+								</li>
+							))
+						}
+					</ul>
+				</section>
+			</div>
 
 			<section class="block">
 				<h2><i>03</i>这个博客</h2>

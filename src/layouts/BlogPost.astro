@@ -61,6 +61,14 @@ const showToc = toc.length >= 3;
 		<style>
 			article {
 				position: relative;
+				max-width: var(--measure);
+				margin-inline: auto;
+			}
+			/* With room for the TOC column, line the text up with the header's left edge. */
+			@media (min-width: 66rem) {
+				article {
+					margin-left: 0;
+				}
 			}
 			.title {
 				margin-bottom: 2.75rem;
@@ -166,7 +174,7 @@ const showToc = toc.length >= 3;
 			.toc-side {
 				display: none;
 			}
-			@media (min-width: 80rem) {
+			@media (min-width: 66rem) {
 				.toc-inline {
 					display: none;
 				}
@@ -176,7 +184,7 @@ const showToc = toc.length >= 3;
 					top: 0;
 					bottom: 0;
 					left: calc(100% + 3.5rem);
-					width: 13rem;
+					width: min(13rem, calc(100vw - var(--measure) - 7.5rem));
 				}
 				.toc-side nav {
 					position: sticky;

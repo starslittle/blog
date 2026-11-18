@@ -28,7 +28,8 @@
 		-apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC',
 		sans-serif;
 	--font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-	--measure: 46rem;
+	--measure: 46rem; /* comfortable line length for reading */
+	--frame: 72rem; /* outer width shared by header, page body and footer */
 }
 /* Dark palette. The header toggle sets data-theme on <html>; without a stored
    choice (or without JS) the reader's system setting decides. Keep both blocks in sync. */
@@ -89,7 +90,7 @@ header,
 main,
 footer {
 	width: 100%;
-	max-width: var(--measure);
+	max-width: var(--frame);
 	margin: 0 auto;
 	padding-inline: 1.25rem;
 }

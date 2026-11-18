@@ -51,6 +51,7 @@ const seriesIds = (Object.keys(SERIES) as SeriesId[]).filter((id) =>
 				color: var(--ink-faint);
 			}
 			.series {
+				max-width: var(--measure);
 				margin: 2.5rem 0 1rem;
 			}
 
@@ -110,6 +111,7 @@ const seriesIds = (Object.keys(SERIES) as SeriesId[]).filter((id) =>
 			}
 			.pdesc {
 				grid-column: 2;
+				max-width: var(--measure);
 				margin: 0;
 				font-size: 0.93rem;
 				line-height: 1.75;
