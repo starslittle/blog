@@ -6,6 +6,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import ShareButtons from '../components/ShareButtons.astro';
 import { SITE_TITLE } from '../consts';
 
 type Link = { href: string; title: string };
@@ -32,6 +33,8 @@ const {
 	next,
 } =
 	Astro.props;
+
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
 
 // Only h2/h3 go in the table of contents, and only when there are enough to help.
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
@@ -152,7 +155,7 @@ const showToc = toc.length >= 3;
 				display: grid;
 				grid-template-columns: 1fr 1fr;
 				gap: 1rem;
-				margin: 3.5rem 0 0;
+				margin: 2rem 0 0;
 				padding-top: 1.75rem;
 				border-top: 1px solid var(--rule);
 			}
@@ -242,6 +245,7 @@ const showToc = toc.length >= 3;
 				<div class="prose">
 					<slot />
 				</div>
+				{pubDate && <ShareButtons title={title} url={pageUrl} />}
 				{
 					(prev || next) && (
 						<nav class="pager" aria-label="上一篇和下一篇">
