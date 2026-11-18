@@ -1,58 +1,581 @@
 ---
+// Homepage: manuscript-paper columns, the vertical title 碎碎念 with a stamped seal,
+// a short intro on the left, then the numbered post list and the series card.
 import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import PostList from '../components/PostList.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { SERIES, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { readingMinutes } from '../utils/reading-time';
+import { seriesPosts } from '../utils/series';
 
-const posts = (await getCollection('blog'))
-	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-	.slice(0, 5);
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const latest = posts[0];
+const total = posts.length;
+const pad = (n: number) => String(n).padStart(2, '0');
+const md = (d: Date) => `${pad(d.getUTCMonth() + 1)}.${pad(d.getUTCDate())}`;
+const claudeParts = await seriesPosts('claude');
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style is:global>
+			/* Display face: Noto Serif SC Black, subset to just 碎念想到什么写·系列一二三四五六七八九十 (4 KB).
+			   Re-download from Google Fonts with text=... if these characters change. */
+			@font-face {
+				font-family: 'Display SC';
+				src: url('/fonts/display-900.woff2') format('woff2');
+				font-weight: 900;
+				font-display: swap;
+			}
+			body.cover header,
+			body.cover footer {
+				max-width: 72rem;
+			}
+		</style>
 		<style>
+			main {
+				max-width: none;
+				padding: 0;
+			}
+
+			/* ---------- First screen ---------- */
 			.hero {
-				padding-block: 1rem 3rem;
+				position: relative;
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				align-items: center;
+				gap: 3rem;
+				max-width: 72rem;
+				min-height: max(36rem, calc(100svh - 6rem));
+				margin: 0 auto;
+				padding: 2rem 1.25rem 4rem;
 			}
-			.hero h1 {
-				font-size: clamp(2.3rem, 7vw, 3.1rem);
-				line-height: 1.2;
-				letter-spacing: 0.02em;
-				margin-bottom: 1.25rem;
+			/* Faint manuscript-paper columns behind the vertical title. */
+			.hero::before {
+				content: '';
+				position: absolute;
+				inset: 0 0 0 auto;
+				width: min(30rem, 48%);
+				background: repeating-linear-gradient(
+					90deg,
+					transparent 0 calc(4.2rem - 1px),
+					color-mix(in srgb, var(--accent) 16%, transparent) calc(4.2rem - 1px) 4.2rem
+				);
+				mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 78%, transparent);
+				pointer-events: none;
 			}
-			.hero h1 em {
-				font-style: italic;
-				font-weight: 400;
+
+			.intro {
+				position: relative;
+				z-index: 1;
+				max-width: 30rem;
+			}
+			.kicker {
+				margin: 0 0 1.25rem;
+				font-size: 0.8rem;
+				letter-spacing: 0.3em;
 				color: var(--accent);
 			}
-			.hero p {
-				margin: 0;
-				font-size: 1.1rem;
+			.intro h1 {
+				margin: 0 0 1.25rem;
+				font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+				line-height: 1.2;
+				letter-spacing: 0.01em;
+			}
+			.intro .lead {
+				margin: 0 0 1.75rem;
+				font-size: 1.12rem;
+				line-height: 1.9;
 				color: var(--ink-soft);
 			}
-			.more {
-				margin: 1.5rem 0 0;
+			.links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.4rem 1.4rem;
+				margin: 0 0 2.75rem;
+				padding: 0;
+				list-style: none;
 				font-size: 0.95rem;
+			}
+			.latest {
+				display: block;
+				padding: 1.1rem 0 0;
+				border-top: 1px solid var(--rule);
+				text-decoration: none;
+			}
+			.latest small {
+				display: block;
+				margin-bottom: 0.35rem;
+				font-size: 0.8rem;
+				letter-spacing: 0.15em;
+				color: var(--ink-faint);
+			}
+			.latest span {
+				font-family: var(--font-serif);
+				font-size: 1.3rem;
+				font-weight: 600;
+				line-height: 1.45;
+				transition: color 0.2s;
+			}
+			.latest:hover span {
+				color: var(--accent);
+			}
+
+			/* The vertical title and the seal */
+			.mark {
+				position: relative;
+				z-index: 1;
+				display: flex;
+				align-items: flex-start;
+				gap: 1.4rem;
+				padding-right: 1rem;
+			}
+			.title {
+				margin: 0;
+				writing-mode: vertical-rl;
+				font-family: 'Display SC', var(--font-serif);
+				font-weight: 900;
+				font-size: clamp(6.5rem, 21vh, 12.5rem);
+				line-height: 1;
+				letter-spacing: 0.06em;
+				color: var(--ink);
+			}
+			.title span {
+				display: inline-block;
+			}
+			.motto {
+				margin: 0.6rem 0 0;
+				writing-mode: vertical-rl;
+				font-family: 'Display SC', var(--font-serif);
+				font-weight: 900;
+				font-size: 1.05rem;
+				letter-spacing: 0.55em;
+				color: var(--accent);
+			}
+			.seal {
+				position: absolute;
+				left: -3.6rem;
+				bottom: -1.6rem;
+				display: grid;
+				place-items: center;
+				width: 7.2rem;
+				height: 7.2rem;
+				border-radius: 10px;
+				background: var(--accent);
+				color: var(--on-accent);
+				font-family: 'Display SC', var(--font-serif);
+				font-weight: 900;
+				font-size: 5rem;
+				line-height: 1;
+				transform: rotate(-7deg);
+				filter: url(#stamp);
+			}
+
+			.cue {
+				position: absolute;
+				left: 50%;
+				bottom: 1.25rem;
+				translate: -50% 0;
+				font-size: 0.8rem;
+				letter-spacing: 0.3em;
+				color: var(--ink-faint);
+				text-decoration: none;
+			}
+
+			/* ---------- Entrance: characters rise one by one, then the seal is stamped ---------- */
+			@media (prefers-reduced-motion: no-preference) {
+				.title span {
+					animation: ink 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+				}
+				.title span:nth-child(2) {
+					animation-delay: 0.12s;
+				}
+				.title span:nth-child(3) {
+					animation-delay: 0.24s;
+				}
+				.motto {
+					animation: fade 0.8s 0.5s ease-out backwards;
+				}
+				.seal {
+					animation: stamp 0.55s 0.85s cubic-bezier(0.3, 1.5, 0.5, 1) backwards;
+				}
+				.intro > * {
+					animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+				}
+				.intro > :nth-child(2) {
+					animation-delay: 0.08s;
+				}
+				.intro > :nth-child(3) {
+					animation-delay: 0.16s;
+				}
+				.intro > :nth-child(n + 4) {
+					animation-delay: 0.24s;
+				}
+				.cue {
+					animation: bob 2.4s 1.6s ease-in-out infinite;
+				}
+			}
+			@keyframes ink {
+				from {
+					opacity: 0;
+					filter: blur(6px);
+					transform: translateY(0.25em);
+				}
+			}
+			@keyframes fade {
+				from {
+					opacity: 0;
+				}
+			}
+			@keyframes stamp {
+				from {
+					opacity: 0;
+					transform: rotate(-16deg) scale(1.9);
+				}
+			}
+			@keyframes rise {
+				from {
+					opacity: 0;
+					transform: translateY(12px);
+				}
+			}
+			@keyframes bob {
+				50% {
+					transform: translateY(5px);
+				}
+			}
+
+			/* ---------- Writing ---------- */
+			.writing {
+				max-width: 72rem;
+				margin: 0 auto;
+				padding: 4rem 1.25rem 2rem;
+			}
+			.section-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 1rem;
+				margin-bottom: 1.5rem;
+			}
+			.section-head h2 {
+				margin: 0;
+				font-size: clamp(1.8rem, 3vw, 2.4rem);
+			}
+			.section-head a {
+				font-size: 0.95rem;
+			}
+			.posts {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			.posts li {
+				border-top: 1px solid var(--rule);
+			}
+			.posts li:last-child {
+				border-bottom: 1px solid var(--rule);
+			}
+			.posts a {
+				position: relative;
+				display: grid;
+				grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+				align-items: baseline;
+				gap: 0.25rem 2rem;
+				padding: 1.6rem 0;
+				text-decoration: none;
+			}
+			/* Small italic serif numbers, sitting on the title's baseline. */
+			.num {
+				font-family: var(--font-newsreader), Georgia, serif;
+				font-style: italic;
+				font-size: 1.2rem;
+				font-weight: 400;
+				line-height: 1;
+				font-variant-numeric: tabular-nums;
+				color: var(--ink-faint);
+				transition: color 0.25s;
+			}
+			.ptitle {
+				font-family: var(--font-serif);
+				font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+				font-weight: 600;
+				line-height: 1.4;
+				transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+			}
+			.pdesc {
+				grid-column: 2;
+				margin: 0;
+				font-size: 0.95rem;
+				line-height: 1.7;
+				color: var(--ink-faint);
+				display: -webkit-box;
+				-webkit-line-clamp: 1;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+			.pmeta {
+				grid-row: 1 / span 2;
+				grid-column: 3;
+				align-self: center;
+				font-size: 0.85rem;
+				color: var(--ink-faint);
+				white-space: nowrap;
+				text-align: right;
+				line-height: 1.6;
+			}
+			.pmeta span {
+				display: block;
+			}
+			/* A vermilion line draws under the row on hover */
+			.posts a::after {
+				content: '';
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: -1px;
+				height: 2px;
+				background: var(--accent);
+				transform: scaleX(0);
+				transform-origin: left;
+				transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+			}
+			.posts a:hover::after {
+				transform: scaleX(1);
+			}
+			.posts a:hover .num {
+				color: var(--accent);
+			}
+			.posts a:hover .ptitle {
+				transform: translateX(0.5rem);
+				color: var(--ink);
+			}
+
+			/* ---------- Series: a paper card with a bookmark ribbon, linking to the series page ---------- */
+			.series {
+				max-width: 72rem;
+				margin: 3.5rem auto 0;
+				padding: 0 1.25rem;
+			}
+			.series-box {
+				position: relative;
+				display: block;
+				padding: 2rem 2.6rem 1.8rem 4.6rem;
+				border: 1px solid var(--rule);
+				border-radius: 4px;
+				background: var(--bg);
+				text-decoration: none;
+				/* A second sheet peeking out underneath. */
+				box-shadow:
+					6px 6px 0 -1px var(--bg),
+					6px 6px 0 0 var(--rule);
+				transition: border-color 0.2s;
+			}
+			.series-box:hover {
+				border-color: var(--accent);
+				color: inherit;
+			}
+			/* The red ribbon hanging from the top edge, with 系列 written down it. */
+			.ribbon {
+				position: absolute;
+				top: -1px;
+				left: 1.6rem;
+				width: 1.9rem;
+				padding: 0.7rem 0 1.4rem;
+				background: var(--accent);
+				color: var(--on-accent);
+				writing-mode: vertical-rl;
+				font-family: 'Display SC', var(--font-serif);
+				font-weight: 900;
+				font-size: 0.95rem;
+				letter-spacing: 0.4em;
+				line-height: 1.9rem;
+				text-align: center;
+				clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 0.7rem), 0 100%);
+			}
+			.series-box h2 {
+				margin: 0 0 0.5rem;
+				font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+				line-height: 1.25;
+				transition: color 0.2s;
+			}
+			.series-box:hover h2 {
+				color: var(--accent);
+			}
+			.series-box p {
+				margin: 0;
+				font-size: 0.92rem;
+				color: var(--ink-faint);
+			}
+
+			/* ---------- Tablets and narrow windows: keep the two columns, scale down ---------- */
+			@media (max-width: 960px) {
+				.hero {
+					/* Room for the seal, which hangs left of the title into this gap. */
+					gap: 3.75rem;
+					min-height: max(32rem, calc(100svh - 6rem));
+				}
+				.title {
+					font-size: clamp(5.5rem, 17vw, 9rem);
+				}
+				.motto {
+					font-size: 0.95rem;
+				}
+				.seal {
+					width: 5.6rem;
+					height: 5.6rem;
+					font-size: 3.9rem;
+					left: -2.6rem;
+					bottom: -1.2rem;
+				}
+				.intro h1 {
+					font-size: clamp(1.9rem, 4.6vw, 2.6rem);
+				}
+				.intro .lead {
+					font-size: 1.02rem;
+				}
+			}
+
+			/* ---------- Phones ---------- */
+			@media (max-width: 560px) {
+				.hero {
+					grid-template-columns: 1fr;
+					gap: 2rem;
+					min-height: auto;
+					padding-top: 2.5rem;
+				}
+				.hero::before {
+					width: 100%;
+					height: 22rem;
+				}
+				.mark {
+					order: -1;
+					justify-content: flex-end;
+					padding-right: 0.5rem;
+				}
+				.title {
+					font-size: clamp(5rem, 24vw, 7.5rem);
+				}
+				.seal {
+					width: 5rem;
+					height: 5rem;
+					font-size: 3.4rem;
+					/* Tuck it against the lower-left corner of the title. */
+					left: auto;
+					right: calc(0.5rem + clamp(5rem, 24vw, 7.5rem) - 1.6rem);
+					bottom: -0.9rem;
+				}
+				.cue {
+					display: none;
+				}
+				.writing {
+					padding-top: 2.5rem;
+				}
+				.posts a {
+					grid-template-columns: 2rem minmax(0, 1fr);
+					gap: 0.2rem 1rem;
+					padding: 1.2rem 0;
+				}
+				.num {
+					font-size: 1.05rem;
+					grid-row: span 3;
+				}
+				.pmeta {
+					grid-row: auto;
+					grid-column: 2;
+					text-align: left;
+				}
+				.pmeta span {
+					display: inline;
+				}
+				.pmeta span + span::before {
+					content: ' · ';
+				}
+				.series-box {
+					padding: 1.7rem 1.3rem 1.5rem 4rem;
+				}
+				.ribbon {
+					left: 1.2rem;
+				}
 			}
 		</style>
 	</head>
-	<body>
+	<body class="cover">
+		<!-- Slightly uneven edges for the seal, like a real stamp. -->
+		<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+			<filter id="stamp" x="-10%" y="-10%" width="120%" height="120%">
+				<feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="3" result="warp" />
+				<feDisplacementMap in="SourceGraphic" in2="warp" scale="5" />
+			</filter>
+		</svg>
+
 		<Header />
 		<main>
 			<section class="hero">
-				<h1><em>Tao</em> 的<br />碎碎念</h1>
-				<p>你好，我是 Tao。这里写我用顺手的工具、踩过的坑，还有一些没想清楚的事。</p>
+				<div class="intro">
+					<p class="kicker">TAO · AI 应用开发</p>
+					<h1>你好，我是 Tao。</h1>
+					<p class="lead">
+						这里写我用顺手的工具、踩过的坑，还有一些没想清楚的事。写得慢，但每篇都是真遇到的。
+					</p>
+					<ul class="links">
+						<li><a href="/about">关于我</a></li>
+						<li><a href="/resume.pdf" target="_blank">简历</a></li>
+						<li><a href="/rss.xml">RSS 订阅</a></li>
+					</ul>
+					<a class="latest" href={`/blog/${latest.id}/`}>
+						<small>最新一篇 · {md(latest.data.pubDate)}</small>
+						<span>{latest.data.title}</span>
+					</a>
+				</div>
+				<div class="mark" aria-label="碎碎念：想到什么，写什么">
+					<p class="motto" aria-hidden="true">想到什么·写什么</p>
+					<p class="title" aria-hidden="true"><span>碎</span><span>碎</span><span>念</span></p>
+					<span class="seal" aria-hidden="true">念</span>
+				</div>
+				<a class="cue" href="#writing">往下读 ↓</a>
 			</section>
-			<section>
-				<h2 class="eyebrow">最近的文章</h2>
-				<PostList posts={posts} />
-				<p class="more"><a href="/blog">全部文章 →</a></p>
+
+			<section class="writing" id="writing">
+				<div class="section-head">
+					<h2>写过的</h2>
+					<a href="/blog">全部 {total} 篇 →</a>
+				</div>
+				<ol class="posts">
+					{
+						posts.slice(0, 6).map((post, i) => (
+							<li>
+								<a href={`/blog/${post.id}/`}>
+									<span class="num">{pad(total - i)}</span>
+									<span class="ptitle">{post.data.title}</span>
+									<p class="pdesc">{post.data.description}</p>
+									<span class="pmeta">
+										<span>{md(post.data.pubDate)}</span>
+										<span>{readingMinutes(post.body ?? '')} 分钟</span>
+									</span>
+								</a>
+							</li>
+						))
+					}
+				</ol>
 			</section>
+
+			{
+				claudeParts.length > 0 && (
+					<section class="series" aria-labelledby="series-title">
+						<a class="series-box" href="/series/claude/">
+							<span class="ribbon" aria-hidden="true">系列</span>
+							<h2 id="series-title">{SERIES.claude.title}</h2>
+							<p>共 {claudeParts.length} 篇，建议按顺序读</p>
+						</a>
+					</section>
+				)
+			}
 		</main>
 		<Footer />
 	</body>
