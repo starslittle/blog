@@ -23,6 +23,7 @@ const claudeParts = await seriesPosts('claude');
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<link rel="preload" href="/fonts/display-900.woff2" as="font" type="font/woff2" crossorigin />
 		<style is:global>
 			/* Display face: Noto Serif SC Black, subset to just 碎念想到什么写·系列一二三四五六七八九十 (4 KB).
 			   Re-download from Google Fonts with text=... if these characters change. */
@@ -30,7 +31,13 @@ const claudeParts = await seriesPosts('claude');
 				font-family: 'Display SC';
 				src: url('/fonts/display-900.woff2') format('woff2');
 				font-weight: 900;
-				font-display: swap;
+				/* Wait for it (preloaded, 4 KB) rather than flash the big title in a
+				   fallback face and then swap: the swap reads as a jump on phones. */
+				font-display: block;
+			}
+			/* This page has its own entrance; don't also slide whole sections in. */
+			body.cover main > * {
+				animation: none;
 			}
 			body.cover header,
 			body.cover footer {
@@ -165,7 +172,8 @@ const claudeParts = await seriesPosts('claude');
 				place-items: center;
 				width: 7.2rem;
 				height: 7.2rem;
-				border-radius: 10px;
+				/* Slightly uneven corners, like a hand-cut stone seal. */
+				border-radius: 12px 8px 13px 9px;
 				background: var(--accent);
 				color: var(--on-accent);
 				font-family: 'Display SC', var(--font-serif);
@@ -173,7 +181,6 @@ const claudeParts = await seriesPosts('claude');
 				font-size: 5rem;
 				line-height: 1;
 				transform: rotate(-7deg);
-				filter: url(#stamp);
 			}
 
 			.cue {
@@ -223,8 +230,7 @@ const claudeParts = await seriesPosts('claude');
 			@keyframes ink {
 				from {
 					opacity: 0;
-					filter: blur(6px);
-					transform: translateY(0.25em);
+					transform: translateY(0.2em);
 				}
 			}
 			@keyframes fade {
@@ -506,14 +512,6 @@ const claudeParts = await seriesPosts('claude');
 		</style>
 	</head>
 	<body class="cover">
-		<!-- Slightly uneven edges for the seal, like a real stamp. -->
-		<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-			<filter id="stamp" x="-10%" y="-10%" width="120%" height="120%">
-				<feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="3" result="warp" />
-				<feDisplacementMap in="SourceGraphic" in2="warp" scale="5" />
-			</filter>
-		</svg>
-
 		<Header />
 		<main>
 			<section class="hero">
