@@ -401,23 +401,25 @@ const showToc = toc.length >= 3;
 				}
 				{pubDate && <p class="back"><a href="/blog">← 全部文章</a></p>}
 				{pubDate && <Comments />}
-				{
-					showToc && (
-						<aside class="toc-side">
-							<nav aria-label="目录">
-								<p class="toc-label">目录</p>
-								<ul class="toc-list">
-									{toc.map((h) => (
-										<li class={`depth-${h.depth}`}>
-											<a href={`#${h.slug}`}>{h.text}</a>
-										</li>
-									))}
-								</ul>
-							</nav>
-						</aside>
-					)
-				}
 			</article>
+			<!-- Outside <article>: the article's entrance animation uses a transform, which
+			     would otherwise make it the TOC's positioning box for a moment. -->
+			{
+				showToc && (
+					<aside class="toc-side">
+						<nav aria-label="目录">
+							<p class="toc-label">目录</p>
+							<ul class="toc-list">
+								{toc.map((h) => (
+									<li class={`depth-${h.depth}`}>
+										<a href={`#${h.slug}`}>{h.text}</a>
+									</li>
+								))}
+							</ul>
+						</nav>
+					</aside>
+				)
+			}
 		</main>
 		<Footer />
 		{
