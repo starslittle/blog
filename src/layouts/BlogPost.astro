@@ -1,4 +1,5 @@
 ---
+import type { MarkdownHeading } from 'astro';
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
@@ -7,9 +8,21 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
 
-type Props = Omit<CollectionEntry<'blog'>['data'], 'pubDate'> & { pubDate?: Date };
+type Link = { href: string; title: string };
+type Props = Omit<CollectionEntry<'blog'>['data'], 'pubDate'> & {
+	pubDate?: Date;
+	headings?: MarkdownHeading[];
+	minutes?: number;
+	prev?: Link;
+	next?: Link;
+};
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, headings = [], minutes, prev, next } =
+	Astro.props;
+
+// Only h2/h3 go in the table of contents, and only when there are enough to help.
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const showToc = toc.length >= 3;
 ---
 
 <!doctype html>
@@ -17,6 +30,9 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 	<head>
 		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
 		<style>
+			article {
+				position: relative;
+			}
 			.meta {
 				margin: 0 0 0.75rem;
 				font-size: 0.88rem;
@@ -36,8 +52,129 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				width: 100%;
 				margin-bottom: 2.5rem;
 			}
-			.back {
+
+			/* Table of contents: a folded box above the text on narrow screens,
+			   a sticky column beside the text on wide ones. */
+			.toc-list {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				font-size: 0.86rem;
+				line-height: 1.5;
+			}
+			.toc-list li {
+				margin: 0;
+			}
+			.toc-list a {
+				display: block;
+				padding: 0.3rem 0 0.3rem 0.85rem;
+				border-left: 2px solid var(--rule);
+				color: var(--ink-faint);
+				text-decoration: none;
+				transition:
+					color 0.15s,
+					border-color 0.15s;
+			}
+			.toc-list .depth-3 a {
+				padding-left: 1.85rem;
+			}
+			.toc-list a:hover {
+				color: var(--ink);
+			}
+			.toc-list a.active {
+				color: var(--ink);
+				border-left-color: var(--accent);
+			}
+			.toc-label {
+				margin: 0 0 0.6rem;
+				font-size: 0.78rem;
+				letter-spacing: 0.2em;
+				color: var(--ink-faint);
+			}
+
+			.toc-inline {
+				margin: 0 0 2.25rem;
+				padding: 0.85rem 1.1rem;
+				background: var(--surface);
+				border-radius: 8px;
+			}
+			.toc-inline summary {
+				cursor: pointer;
+				font-size: 0.9rem;
+				color: var(--ink-soft);
+			}
+			.toc-inline[open] summary {
+				margin-bottom: 0.6rem;
+			}
+			.toc-side {
+				display: none;
+			}
+			@media (min-width: 80rem) {
+				.toc-inline {
+					display: none;
+				}
+				.toc-side {
+					display: block;
+					position: absolute;
+					top: 0;
+					bottom: 0;
+					left: calc(100% + 3.5rem);
+					width: 13rem;
+				}
+				.toc-side nav {
+					position: sticky;
+					top: 2.5rem;
+					max-height: calc(100vh - 5rem);
+					overflow-y: auto;
+				}
+			}
+
+			/* Older / newer post */
+			.pager {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
 				margin: 3.5rem 0 0;
+				padding-top: 1.75rem;
+				border-top: 1px solid var(--rule);
+			}
+			.pager a {
+				display: block;
+				padding: 0.9rem 1.1rem;
+				border: 1px solid var(--rule);
+				border-radius: 8px;
+				text-decoration: none;
+				line-height: 1.5;
+				transition: border-color 0.15s;
+			}
+			.pager a:hover {
+				border-color: var(--accent);
+				color: inherit;
+			}
+			.pager .newer {
+				grid-column: 2;
+				text-align: right;
+			}
+			.pager small {
+				display: block;
+				margin-bottom: 0.3rem;
+				font-size: 0.8rem;
+				color: var(--ink-faint);
+			}
+			.pager span {
+				font-family: var(--font-serif);
+				font-weight: 600;
+			}
+			@media (max-width: 600px) {
+				.pager {
+					grid-template-columns: 1fr;
+				}
+				.pager .newer {
+					grid-column: auto;
+				}
+			}
+			.back {
+				margin: 2rem 0 0;
 				font-size: 0.95rem;
 			}
 		</style>
@@ -52,6 +189,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 						pubDate && (
 							<p class="meta">
 								<FormattedDate date={pubDate} />
+								{minutes && <span>　·　约 {minutes} 分钟读完</span>}
 								{updatedDate && (
 									<span>
 										　·　最后更新于 <FormattedDate date={updatedDate} />
@@ -69,12 +207,92 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 						</div>
 					)
 				}
+				{
+					showToc && (
+						<details class="toc-inline">
+							<summary>目录</summary>
+							<ul class="toc-list">
+								{toc.map((h) => (
+									<li class={`depth-${h.depth}`}>
+										<a href={`#${h.slug}`}>{h.text}</a>
+									</li>
+								))}
+							</ul>
+						</details>
+					)
+				}
 				<div class="prose">
 					<slot />
 				</div>
+				{
+					(prev || next) && (
+						<nav class="pager" aria-label="上一篇和下一篇">
+							{prev && (
+								<a class="older" href={prev.href}>
+									<small>← 上一篇</small>
+									<span>{prev.title}</span>
+								</a>
+							)}
+							{next && (
+								<a class="newer" href={next.href}>
+									<small>下一篇 →</small>
+									<span>{next.title}</span>
+								</a>
+							)}
+						</nav>
+					)
+				}
 				{pubDate && <p class="back"><a href="/blog">← 全部文章</a></p>}
+				{
+					showToc && (
+						<aside class="toc-side">
+							<nav aria-label="目录">
+								<p class="toc-label">目录</p>
+								<ul class="toc-list">
+									{toc.map((h) => (
+										<li class={`depth-${h.depth}`}>
+											<a href={`#${h.slug}`}>{h.text}</a>
+										</li>
+									))}
+								</ul>
+							</nav>
+						</aside>
+					)
+				}
 			</article>
 		</main>
 		<Footer />
+		{
+			showToc && (
+				<script>
+					// Highlight the section being read: the last heading that has scrolled
+					// past the top fifth of the window.
+					const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc-list a')];
+					const heads = [...new Set(links.map((a) => decodeURIComponent(a.hash.slice(1))))]
+						.map((id) => document.getElementById(id))
+						.filter((el): el is HTMLElement => el !== null);
+					// Browsers already fire scroll at most once per frame, so no extra throttling.
+					const update = () => {
+						const line = innerHeight * 0.2;
+						let current: string | null = null;
+						for (const h of heads) {
+							if (h.getBoundingClientRect().top <= line) current = h.id;
+							else break;
+						}
+						// At the very bottom the last heading may never reach the line.
+						const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+						if (atBottom && heads.length && heads.at(-1)!.getBoundingClientRect().top < innerHeight) {
+							current = heads.at(-1)!.id;
+						}
+						for (const a of links) {
+							a.classList.toggle('active', decodeURIComponent(a.hash.slice(1)) === current);
+						}
+					};
+					addEventListener('scroll', update, { passive: true });
+					addEventListener('resize', update, { passive: true });
+					update();
+				</script>
+			)
+		}
 	</body>
 </html>

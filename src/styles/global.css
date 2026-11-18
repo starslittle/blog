@@ -57,6 +57,11 @@
 html {
 	-webkit-text-size-adjust: 100%;
 }
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
 body {
 	margin: 0;
 	min-height: 100vh;
@@ -153,6 +158,9 @@ hr {
 .prose {
 	text-align: justify;
 }
+.prose :is(h2, h3) {
+	scroll-margin-top: 1.5rem;
+}
 .prose h2 {
 	margin-top: 2.2em;
 	text-align: left;
@@ -198,7 +206,26 @@ code {
 	background: var(--surface);
 	border-radius: 4px;
 }
-pre {
+/* Plain <pre> only; code blocks from Markdown are styled by Expressive Code. */
+.expressive-code {
+	margin: 1.6em 0;
+}
+/* Paper tones instead of GitHub's white/grey. The selector has to outrank the
+   theme rules Expressive Code generates ([data-theme='dark'] .expressive-code:not(...)), hence the doubled class. */
+:root[data-theme] .prose .expressive-code.expressive-code {
+	--ec-codeBg: var(--surface);
+	--ec-frm-edBg: var(--surface);
+	--ec-frm-edTabBarBg: var(--surface);
+	--ec-frm-edActTabBg: var(--surface);
+	--ec-frm-edActTabIndBtmCol: var(--surface);
+	--ec-frm-edTabBarBrdBtmCol: var(--rule);
+	--ec-frm-trmBg: var(--surface);
+	--ec-frm-trmTtbBg: var(--surface);
+	--ec-frm-trmTtbBrdBtmCol: var(--rule);
+	--ec-frm-tooltipSuccessBg: var(--accent);
+	--ec-frm-tooltipSuccessFg: var(--on-accent);
+}
+pre:not(.expressive-code pre) {
 	margin: 1.6em 0;
 	padding: 1.1em 1.25em;
 	border-radius: 8px;
@@ -207,7 +234,7 @@ pre {
 	line-height: 1.65;
 	text-align: left;
 }
-pre > code {
+pre:not(.expressive-code pre) > code {
 	all: unset;
 	font-family: var(--font-mono);
 }
