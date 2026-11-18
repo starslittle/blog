@@ -1,5 +1,5 @@
 ---
-// About: paper-style opening, then a short statement, a timeline and project cards.
+// About: paper-style opening, then a timeline and project cards.
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
@@ -57,18 +57,6 @@ const openSource = [
 				margin: 0;
 				font-size: 1.05rem;
 				color: var(--ink-soft);
-			}
-
-			/* A short statement, set larger, with a red rule */
-			.statement {
-				max-width: var(--measure);
-				margin: 2.5rem 0 0;
-				padding-left: 1.3rem;
-				border-left: 3px solid var(--accent);
-				font-family: var(--font-serif);
-				font-size: clamp(1.15rem, 2.4vw, 1.35rem);
-				line-height: 1.85;
-				color: var(--ink);
 			}
 
 			.block {
@@ -222,11 +210,6 @@ const openSource = [
 				<p class="hello">你好，我是 Tao。</p>
 				<p class="role">做 AI 应用开发，也写全栈。</p>
 			</PaperHero>
-
-			<p class="statement">
-				比起训练模型，我更关心怎么让模型在真实产品里稳定地把事情做完：检索要召回对的东西，Agent
-				出错了要知道停下来，上线之前要有评测兜底。
-			</p>
 
 			<div class="cols">
 				<section class="block">
