@@ -13,11 +13,24 @@ type Props = Omit<CollectionEntry<'blog'>['data'], 'pubDate'> & {
 	pubDate?: Date;
 	headings?: MarkdownHeading[];
 	minutes?: number;
+	/** Share card path; pages without one (like 关于) use the site card. */
+	ogImage?: string;
 	prev?: Link;
 	next?: Link;
 };
 
-const { title, description, pubDate, updatedDate, heroImage, headings = [], minutes, prev, next } =
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	heroImage,
+	headings = [],
+	minutes,
+	ogImage,
+	prev,
+	next,
+} =
 	Astro.props;
 
 // Only h2/h3 go in the table of contents, and only when there are enough to help.
@@ -28,7 +41,12 @@ const showToc = toc.length >= 3;
 <!doctype html>
 <html lang="zh-CN">
 	<head>
-		<BaseHead title={`${title} | ${SITE_TITLE}`} description={description} />
+		<BaseHead
+			title={`${title} | ${SITE_TITLE}`}
+			description={description}
+			image={ogImage}
+			type={pubDate ? 'article' : 'website'}
+		/>
 		<style>
 			article {
 				position: relative;

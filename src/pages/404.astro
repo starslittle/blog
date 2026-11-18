@@ -1,0 +1,83 @@
+---
+// Shown for any address that doesn't exist (Vercel serves dist/404.html).
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import PostList from '../components/PostList.astro';
+import { SITE_TITLE } from '../consts';
+
+const recent = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`页面不存在 | ${SITE_TITLE}`} description="这个地址没有对应的页面。" />
+		<meta name="robots" content="noindex" />
+		<style>
+			.lost {
+				padding-block: 1rem 2.5rem;
+			}
+			.lost .code {
+				margin: 0 0 0.5rem;
+				font-family: var(--font-serif);
+				font-size: clamp(4.5rem, 16vw, 6.5rem);
+				font-weight: 600;
+				line-height: 1;
+				color: var(--accent);
+				letter-spacing: 0.04em;
+			}
+			.lost h1 {
+				font-size: clamp(1.8rem, 6vw, 2.3rem);
+			}
+			.lost p {
+				margin: 0;
+				color: var(--ink-soft);
+			}
+			.actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.75rem;
+				margin-top: 1.75rem !important;
+			}
+			.actions a {
+				padding: 0.45rem 1.1rem;
+				border: 1px solid var(--rule);
+				border-radius: 999px;
+				font-size: 0.95rem;
+				text-decoration: none;
+				transition: border-color 0.15s;
+			}
+			.actions a:hover {
+				border-color: var(--accent);
+			}
+			.actions a.primary {
+				background: var(--accent);
+				border-color: var(--accent);
+				color: var(--on-accent);
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="lost">
+				<p class="code">404</p>
+				<h1>这一页不存在</h1>
+				<p>可能是链接打错了，也可能是文章换了地址。</p>
+				<p class="actions">
+					<a class="primary" href="/">回到首页</a>
+					<a href="/blog">看全部文章</a>
+				</p>
+			</section>
+			<section>
+				<p class="eyebrow">最近写的</p>
+				<PostList posts={recent} />
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

@@ -33,6 +33,7 @@ const { Content, headings } = await render(post);
 	{...post.data}
 	headings={headings}
 	minutes={readingMinutes(post.body ?? '')}
+	ogImage={`/og/${post.id}.png`}
 	prev={prev}
 	next={next}
 >
