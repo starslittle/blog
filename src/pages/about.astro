@@ -1,5 +1,10 @@
 ---
-import Layout from '../layouts/BlogPost.astro';
+// About: paper-style opening, then a short statement, a timeline and project cards.
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import PaperHero from '../components/PaperHero.astro';
+import { SITE_TITLE } from '../consts';
 
 const experience = [
 	{
@@ -35,93 +40,227 @@ const openSource = [
 ];
 ---
 
-<Layout title="关于" description="Tao 是谁，做过什么，这个博客写什么。">
-	<p class="lead">
-		你好，我是 Tao，做 AI 应用开发，也写全栈。
-	</p>
-	<p>
-		比起训练模型，我更关心怎么让模型在真实产品里稳定地把事情做完：检索要召回对的东西，Agent
-		出错了要知道停下来，上线之前要有评测兜底。
-	</p>
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`关于 | ${SITE_TITLE}`} description="Tao 是谁，做过什么，这个博客写什么。" />
+		<link rel="preload" href="/fonts/display-900.woff2" as="font" type="font/woff2" crossorigin />
+		<style>
+			.hello {
+				margin: 0 0 0.6rem;
+				font-family: var(--font-serif);
+				font-size: clamp(2rem, 5vw, 2.8rem);
+				font-weight: 600;
+				line-height: 1.2;
+			}
+			.role {
+				margin: 0;
+				font-size: 1.05rem;
+				color: var(--ink-soft);
+			}
 
-	<h2>做过的事</h2>
-	<ol class="timeline">
-		{
-			experience.map((item) => (
-				<li>
-					<span class="period">{item.period}</span>
-					<span class="place">{item.place}</span>
-				</li>
-			))
-		}
-	</ol>
+			/* A short statement, set larger, with a red rule */
+			.statement {
+				margin: 2.5rem 0 0;
+				padding-left: 1.3rem;
+				border-left: 3px solid var(--accent);
+				font-family: var(--font-serif);
+				font-size: clamp(1.15rem, 2.4vw, 1.35rem);
+				line-height: 1.85;
+				color: var(--ink);
+			}
 
-	<h2>开源与项目</h2>
-	<p>我喜欢在用到的开源项目里顺手修问题，也自己做点东西。</p>
-	<dl class="projects">
-		{
-			openSource.map((item) => (
-				<>
-					<dt>
-						<a href={item.href}>{item.name}</a>
-					</dt>
-					<dd>{item.text}</dd>
-				</>
-			))
-		}
-	</dl>
+			.block {
+				margin-top: 3.5rem;
+			}
+			.block h2 {
+				display: flex;
+				align-items: baseline;
+				gap: 0.7rem;
+				margin: 0 0 1.2rem;
+				font-size: 1.45rem;
+			}
+			.block h2 i {
+				font-family: var(--font-newsreader), Georgia, serif;
+				font-size: 1.05rem;
+				font-weight: 400;
+				color: var(--ink-faint);
+			}
+			.block > p {
+				margin: 0 0 1.2rem;
+				color: var(--ink-soft);
+			}
 
-	<h2>这个博客</h2>
-	<p>
-		这里是我的碎碎念：工作里刚解决的问题、用着顺手的工具、还没想清楚的想法。不求完整，只求写下来。
-	</p>
-</Layout>
+			/* Timeline: a thin rail with red dots */
+			.timeline {
+				position: relative;
+				list-style: none;
+				margin: 0;
+				padding: 0 0 0 1.6rem;
+			}
+			.timeline::before {
+				content: '';
+				position: absolute;
+				top: 0.6rem;
+				bottom: 0.6rem;
+				left: 0.3rem;
+				width: 1px;
+				background: var(--rule);
+			}
+			.timeline li {
+				position: relative;
+				padding: 0.55rem 0 1.1rem;
+			}
+			.timeline li::before {
+				content: '';
+				position: absolute;
+				top: 1.05rem;
+				left: -1.6rem;
+				width: 0.62rem;
+				height: 0.62rem;
+				border-radius: 50%;
+				background: var(--bg);
+				border: 2px solid var(--accent);
+				translate: 0.02rem 0;
+			}
+			.timeline li:first-child::before {
+				background: var(--accent);
+			}
+			.period {
+				display: block;
+				font-family: var(--font-newsreader), Georgia, serif;
+				font-style: italic;
+				font-size: 1rem;
+				color: var(--ink-faint);
+			}
+			.place {
+				display: block;
+				font-family: var(--font-serif);
+				font-size: 1.2rem;
+				font-weight: 600;
+				line-height: 1.5;
+			}
 
-<style>
-	.lead {
-		font-size: 1.12em;
-		color: var(--ink);
-	}
-	.timeline {
-		list-style: none;
-		margin: 0 0 1.2em;
-		padding: 0;
-		text-align: left;
-	}
-	.timeline li {
-		display: grid;
-		grid-template-columns: 10.5rem 1fr;
-		gap: 0 1rem;
-		align-items: baseline;
-		padding: 0.7rem 0;
-		border-bottom: 1px solid var(--rule);
-	}
-	.period {
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
-		color: var(--ink-faint);
-	}
-	.place {
-		font-family: var(--font-serif);
-		font-weight: 600;
-		font-size: 1.1rem;
-	}
-	@media (max-width: 600px) {
-		.timeline li {
-			grid-template-columns: 1fr;
-		}
-	}
-	.projects {
-		margin: 0 0 1.2em;
-		text-align: left;
-	}
-	.projects dt {
-		font-family: var(--font-serif);
-		font-weight: 600;
-		font-size: 1.1rem;
-	}
-	.projects dd {
-		margin: 0.2rem 0 1.2rem;
-		color: var(--ink-soft);
-	}
-</style>
+			/* Project cards */
+			.projects {
+				display: grid;
+				gap: 0.9rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.projects a {
+				display: block;
+				padding: 1.1rem 1.3rem 1.15rem;
+				border: 1px solid var(--rule);
+				border-radius: 6px;
+				text-decoration: none;
+				transition:
+					border-color 0.2s,
+					transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+			}
+			.projects a:hover {
+				border-color: var(--accent);
+				color: inherit;
+				transform: translateY(-2px);
+			}
+			.pname {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 1rem;
+				margin-bottom: 0.3rem;
+				font-family: var(--font-serif);
+				font-size: 1.2rem;
+				font-weight: 600;
+			}
+			.pname span {
+				font-family: var(--font-sans);
+				font-size: 0.95rem;
+				font-weight: 400;
+				color: var(--ink-faint);
+				transition: color 0.2s;
+			}
+			.projects a:hover .pname span {
+				color: var(--accent);
+			}
+			.ptext {
+				font-size: 0.95rem;
+				line-height: 1.75;
+				color: var(--ink-soft);
+			}
+
+			.links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.4rem 1.4rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				font-size: 0.95rem;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<PaperHero mark="关于">
+				<p class="eyebrow">关于我</p>
+				<p class="hello">你好，我是 Tao。</p>
+				<p class="role">做 AI 应用开发，也写全栈。</p>
+			</PaperHero>
+
+			<p class="statement">
+				比起训练模型，我更关心怎么让模型在真实产品里稳定地把事情做完：检索要召回对的东西，Agent
+				出错了要知道停下来，上线之前要有评测兜底。
+			</p>
+
+			<section class="block">
+				<h2><i>01</i>做过的事</h2>
+				<ol class="timeline">
+					{
+						experience.map((item) => (
+							<li>
+								<span class="period">{item.period}</span>
+								<span class="place">{item.place}</span>
+							</li>
+						))
+					}
+				</ol>
+			</section>
+
+			<section class="block">
+				<h2><i>02</i>开源与项目</h2>
+				<p>我喜欢在用到的开源项目里顺手修问题，也自己做点东西。</p>
+				<ul class="projects">
+					{
+						openSource.map((item) => (
+							<li>
+								<a href={item.href} target="_blank" rel="noopener">
+									<span class="pname">
+										{item.name}
+										<span aria-hidden="true">↗</span>
+									</span>
+									<span class="ptext">{item.text}</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<section class="block">
+				<h2><i>03</i>这个博客</h2>
+				<p>
+					这里是我的碎碎念：工作里刚解决的问题、用着顺手的工具、还没想清楚的想法。不求完整，只求写下来。
+				</p>
+				<ul class="links">
+					<li><a href="/blog">全部文章</a></li>
+					<li><a href="/resume.pdf" target="_blank">简历</a></li>
+					<li><a href="/rss.xml">RSS 订阅</a></li>
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

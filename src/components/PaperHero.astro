@@ -1,0 +1,116 @@
+---
+// Page opening in the homepage's style: a vertical display title over faint
+// manuscript-paper columns on the right, the page's own intro (slot) on the left.
+// The display font only has a few characters; see the note in global.css.
+// Pages using this should preload /fonts/display-900.woff2 in their <head>.
+interface Props {
+	/** Vertical display text, e.g. 文章 */
+	mark: string;
+	/** Small vertical line in red beside it */
+	motto?: string;
+}
+const { mark, motto } = Astro.props;
+---
+
+<section class="paper-hero">
+	<div class="intro"><slot /></div>
+	<div class="mark" aria-hidden="true">
+		{motto && <p class="motto">{motto}</p>}
+		<p class="title">{[...mark].map((c) => <span>{c}</span>)}</p>
+	</div>
+</section>
+
+
+<style>
+	.paper-hero {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: end;
+		gap: 3rem;
+		padding: 1rem 0 3rem;
+		margin-bottom: 1rem;
+		border-bottom: 1px solid var(--rule);
+	}
+	.paper-hero::before {
+		content: '';
+		position: absolute;
+		inset: -1rem 0 0 auto;
+		width: min(16rem, 40%);
+		background: repeating-linear-gradient(
+			90deg,
+			transparent 0 calc(3.6rem - 1px),
+			color-mix(in srgb, var(--accent) 16%, transparent) calc(3.6rem - 1px) 3.6rem
+		);
+		mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 80%, transparent);
+		pointer-events: none;
+	}
+	.intro {
+		position: relative;
+		z-index: 1;
+		min-width: 0;
+	}
+	.mark {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		padding-right: 0.25rem;
+	}
+	.title {
+		margin: 0;
+		writing-mode: vertical-rl;
+		font-family: 'Display SC', var(--font-serif);
+		font-weight: 900;
+		font-size: clamp(4.5rem, 12vw, 7rem);
+		line-height: 1;
+		letter-spacing: 0.06em;
+		color: var(--ink);
+	}
+	.title span {
+		display: inline-block;
+	}
+	.motto {
+		margin: 0.4rem 0 0;
+		writing-mode: vertical-rl;
+		font-family: var(--font-serif);
+		font-size: 0.9rem;
+		letter-spacing: 0.45em;
+		color: var(--accent);
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.title span {
+			animation: ink 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+		}
+		.title span:nth-child(2) {
+			animation-delay: 0.12s;
+		}
+		.motto {
+			animation: fade 0.8s 0.35s ease-out backwards;
+		}
+	}
+	@keyframes ink {
+		from {
+			opacity: 0;
+			transform: translateY(0.2em);
+		}
+	}
+	@keyframes fade {
+		from {
+			opacity: 0;
+		}
+	}
+	@media (max-width: 560px) {
+		.paper-hero {
+			gap: 1.25rem;
+			padding-bottom: 2rem;
+		}
+		.title {
+			font-size: 4rem;
+		}
+		.motto {
+			display: none;
+		}
+	}
+</style>

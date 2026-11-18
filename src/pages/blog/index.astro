@@ -1,78 +1,217 @@
 ---
+// All posts, newest first, grouped by month, under a paper-style opening.
 import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
-import PostList from '../../components/PostList.astro';
+import PaperHero from '../../components/PaperHero.astro';
+import SeriesCard from '../../components/SeriesCard.astro';
 import { SERIES, SITE_DESCRIPTION, SITE_TITLE, type SeriesId } from '../../consts';
+import { readingMinutes } from '../../utils/reading-time';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-const series = (Object.keys(SERIES) as SeriesId[])
-	.map((id) => ({ id, ...SERIES[id], count: posts.filter((p) => p.data.series === id).length }))
-	.filter((s) => s.count > 0);
+const pad = (n: number) => String(n).padStart(2, '0');
+const first = posts.at(-1)?.data.pubDate;
+
+// Group by year and month, keeping newest-first order.
+const groups: { key: string; year: number; month: number; posts: typeof posts }[] = [];
+for (const post of posts) {
+	const d = post.data.pubDate;
+	const key = `${d.getUTCFullYear()}-${d.getUTCMonth()}`;
+	let g = groups.at(-1);
+	if (!g || g.key !== key) {
+		g = { key, year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, posts: [] };
+		groups.push(g);
+	}
+	g.posts.push(post);
+}
+const seriesIds = (Object.keys(SERIES) as SeriesId[]).filter((id) =>
+	posts.some((p) => p.data.series === id),
+);
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={`文章 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<link rel="preload" href="/fonts/display-900.woff2" as="font" type="font/woff2" crossorigin />
 		<style>
-			.series-list {
-				display: grid;
-				gap: 0.75rem;
-				margin: 0 0 2.5rem;
-			}
-			.series-card {
-				display: block;
-				padding: 1rem 1.2rem;
-				border: 1px solid var(--rule);
-				border-left: 3px solid var(--accent);
-				border-radius: 8px;
-				text-decoration: none;
-				line-height: 1.6;
-				transition: border-color 0.15s;
-			}
-			.series-card:hover {
-				border-color: var(--accent);
-				color: inherit;
-			}
-			.series-card small {
-				display: block;
-				font-size: 0.8rem;
-				letter-spacing: 0.15em;
-				color: var(--ink-faint);
-			}
-			.series-card strong {
+			.lead {
+				margin: 0 0 0.4rem;
 				font-family: var(--font-serif);
-				font-size: 1.15rem;
+				font-size: clamp(1.6rem, 4vw, 2.2rem);
+				font-weight: 600;
+				line-height: 1.35;
 			}
 			.count {
-				margin-bottom: 2rem;
+				margin: 0;
+				font-size: 0.95rem;
 				color: var(--ink-faint);
-				font-size: 0.92rem;
+			}
+			.series {
+				margin: 2.5rem 0 1rem;
+			}
+
+			.month {
+				margin-top: 3rem;
+			}
+			.month h2 {
+				display: flex;
+				align-items: baseline;
+				gap: 0.8rem;
+				margin: 0 0 0.5rem;
+				font-family: var(--font-newsreader), Georgia, serif;
+				font-style: italic;
+				font-weight: 400;
+				font-size: 2.4rem;
+				line-height: 1;
+				color: var(--ink-faint);
+			}
+			.month h2 small {
+				font-family: var(--font-sans);
+				font-style: normal;
+				font-size: 0.85rem;
+				letter-spacing: 0.15em;
+			}
+
+			.posts {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			.posts li {
+				border-top: 1px solid var(--rule);
+			}
+			.posts a {
+				position: relative;
+				display: grid;
+				grid-template-columns: 3.2rem minmax(0, 1fr);
+				gap: 0.3rem 1.25rem;
+				align-items: baseline;
+				padding: 1.3rem 0;
+				text-decoration: none;
+			}
+			.day {
+				font-family: var(--font-newsreader), Georgia, serif;
+				font-style: italic;
+				font-size: 1.2rem;
+				line-height: 1;
+				color: var(--ink-faint);
+				transition: color 0.25s;
+			}
+			.ptitle {
+				font-family: var(--font-serif);
+				font-size: 1.3rem;
+				font-weight: 600;
+				line-height: 1.45;
+				transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+			}
+			.pdesc {
+				grid-column: 2;
+				margin: 0;
+				font-size: 0.93rem;
+				line-height: 1.75;
+				color: var(--ink-faint);
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+			.pmeta {
+				grid-column: 2;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.3rem 0.9rem;
+				font-size: 0.82rem;
+				color: var(--ink-faint);
+			}
+			.tag {
+				color: var(--accent);
+			}
+			.posts a::after {
+				content: '';
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: -1px;
+				height: 2px;
+				background: var(--accent);
+				transform: scaleX(0);
+				transform-origin: left;
+				transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+			}
+			.posts a:hover::after {
+				transform: scaleX(1);
+			}
+			.posts a:hover .day {
+				color: var(--accent);
+			}
+			.posts a:hover .ptitle {
+				transform: translateX(0.4rem);
+				color: var(--ink);
+			}
+			@media (max-width: 560px) {
+				.posts a {
+					grid-template-columns: 2.4rem minmax(0, 1fr);
+					gap: 0.25rem 0.9rem;
+				}
+				.ptitle {
+					font-size: 1.15rem;
+				}
+				.month h2 {
+					font-size: 2rem;
+				}
 			}
 		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>文章</h1>
+			<PaperHero mark="文章" motto="想到什么·写什么">
+				<p class="eyebrow">全部文章</p>
+				<p class="lead">工具、踩过的坑，<br />和一些没想清楚的事。</p>
+				<p class="count">
+					共 {posts.length} 篇{first && `，从 ${first.getUTCFullYear()}.${pad(first.getUTCMonth() + 1)} 写起`}
+				</p>
+			</PaperHero>
+
 			{
-				series.length > 0 && (
-					<div class="series-list">
-						{series.map((s) => (
-							<a class="series-card" href={`/series/${s.id}/`}>
-								<small>系列 · {s.count} 篇</small>
-								<strong>{s.title} →</strong>
-							</a>
+				seriesIds.length > 0 && (
+					<div class="series">
+						{seriesIds.map((id) => (
+							<SeriesCard id={id} />
 						))}
 					</div>
 				)
 			}
-			<p class="count">共 {posts.length} 篇，按时间倒序。</p>
-			<PostList posts={posts} />
+
+			{
+				groups.map((g) => (
+					<section class="month" aria-label={`${g.year} 年 ${g.month} 月`}>
+						<h2>
+							{pad(g.month)}
+							<small>{g.year} 年 {g.month} 月</small>
+						</h2>
+						<ol class="posts">
+							{g.posts.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>
+										<span class="day">{pad(post.data.pubDate.getUTCDate())}</span>
+										<span class="ptitle">{post.data.title}</span>
+										<p class="pdesc">{post.data.description}</p>
+										<span class="pmeta">
+											<span>{readingMinutes(post.body ?? '')} 分钟读完</span>
+											{post.data.series && <span class="tag">{SERIES[post.data.series].title}</span>}
+										</span>
+									</a>
+								</li>
+							))}
+						</ol>
+					</section>
+				))
+			}
 		</main>
 		<Footer />
 	</body>

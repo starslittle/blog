@@ -1,5 +1,15 @@
 /* Tao的碎碎念 — paper, ink and one vermilion seal. */
 
+/* Display face for the big vertical titles: Noto Serif SC Black, subset to
+   碎念想到什么写·系列一二三四五六七八九十文章关于 (4.5 KB). Re-download from Google Fonts
+   with text=... when a page needs other characters. */
+@font-face {
+	font-family: 'Display SC';
+	src: url('/fonts/display-900.woff2') format('woff2');
+	font-weight: 900;
+	font-display: block;
+}
+
 :root {
 	color-scheme: light dark;
 	--bg: #f7f3ea;
