@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { SERIES, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { SERIES, SITE_DESCRIPTION, SITE_TITLE, type SeriesId } from '../consts';
 import { readingMinutes } from '../utils/reading-time';
 import { seriesPosts } from '../utils/series';
 
@@ -16,7 +16,15 @@ const latest = posts[0];
 const total = posts.length;
 const pad = (n: number) => String(n).padStart(2, '0');
 const md = (d: Date) => `${pad(d.getUTCMonth() + 1)}.${pad(d.getUTCDate())}`;
-const claudeParts = await seriesPosts('claude');
+const seriesList = (
+	await Promise.all(
+		(Object.keys(SERIES) as SeriesId[]).map(async (id) => ({
+			id,
+			title: SERIES[id].title,
+			count: (await seriesPosts(id)).length,
+		})),
+	)
+).filter((s) => s.count > 0);
 ---
 
 <!doctype html>
@@ -354,6 +362,9 @@ const claudeParts = await seriesPosts('claude');
 
 			/* ---------- Series: a paper card with a bookmark ribbon, linking to the series page ---------- */
 			.series {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+				gap: 1.5rem;
 				max-width: 72rem;
 				margin: 3.5rem auto 0;
 				padding: 0 1.25rem;
@@ -552,13 +563,15 @@ const claudeParts = await seriesPosts('claude');
 			</section>
 
 			{
-				claudeParts.length > 0 && (
-					<section class="series" aria-labelledby="series-title">
-						<a class="series-box" href="/series/claude/">
-							<span class="ribbon" aria-hidden="true">系列</span>
-							<h2 id="series-title">{SERIES.claude.title}</h2>
-							<p>共 {claudeParts.length} 篇，建议按顺序读</p>
-						</a>
+				seriesList.length > 0 && (
+					<section class="series" aria-label="系列">
+						{seriesList.map((s) => (
+							<a class="series-box" href={`/series/${s.id}/`}>
+								<span class="ribbon" aria-hidden="true">系列</span>
+								<h2>{s.title}</h2>
+								<p>共 {s.count} 篇，建议按顺序读</p>
+							</a>
+						))}
 					</section>
 				)
 			}

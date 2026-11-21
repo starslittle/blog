@@ -6,6 +6,10 @@ export const SITE_DESCRIPTION = '想到什么写什么：工作、技术和生�
 
 // Post series. A post joins one with `series: <id>` and `seriesOrder: <n>` in its frontmatter.
 export const SERIES = {
+	growth: {
+		title: '成长',
+		description: '秋招之后，关于背书、能力，以及 AI 时代该怎么成长的一些想法。',
+	},
 	claude: {
 		title: 'Claude 使用笔记',
 		description: '用 Claude 干活时攒下的经验和小工具，也包括它和 Codex 怎么搭配。',

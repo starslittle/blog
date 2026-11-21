@@ -2,6 +2,8 @@
 title: 'AI 长得这么快，内蕴还来得及攒吗'
 description: '上一篇说背书只能敲开门，内蕴才能走远。写完我又担心：AI 进步得这么快，我攒的这点东西会不会被它甩在后面？想了几天，答案是还来得及，只是要攒对东西。'
 pubDate: '2026-11-22'
+series: growth
+seriesOrder: 2
 ---
 
 [上一篇](/blog/endorsement-and-substance/)写完，我心里冒出一个担心。
