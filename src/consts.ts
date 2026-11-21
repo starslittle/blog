@@ -10,6 +10,10 @@ export const SERIES = {
 		title: '成长',
 		description: '秋招之后，关于背书、能力，以及 AI 时代该怎么成长的一些想法。',
 	},
+	future: {
+		title: '未来视野',
+		description: 'AI 和机器人越来越强以后，哪些工作会更值钱，哪些会被替代。',
+	},
 	claude: {
 		title: 'Claude 使用笔记',
 		description: '用 Claude 干活时攒下的经验和小工具，也包括它和 Codex 怎么搭配。',
