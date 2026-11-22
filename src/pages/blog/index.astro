@@ -149,14 +149,22 @@ const seriesIds = (Object.keys(SERIES) as SeriesId[]).filter((id) =>
 			.posts a:hover .day {
 				color: var(--accent);
 			}
-			/* The row link itself never turns red (the site-wide a:hover would fade it
-			   red and back, and the title flashed red on mouse-out). Only the number or
-			   date and the underline show the hover state. No slide either: moving text
-			   gets redrawn when it stops and looks like it flashes darker. */
+			/* The row link itself never changes colour (the site-wide a:hover would fade
+			   it red and back, which made the title flash on mouse-out). No slide either:
+			   moving text gets redrawn when it stops and looks like it flashes darker. */
 			.posts a,
 			.posts a:hover {
 				color: var(--ink);
 				transition: none;
+			}
+			/* The title takes the accent colour for as long as the row is hovered, and
+			   fades in and out on its own (it never inherits the link's colour). */
+			.posts .ptitle {
+				color: var(--ink);
+				transition: color 0.2s ease;
+			}
+			.posts a:hover .ptitle {
+				color: var(--accent);
 			}
 			@media (max-width: 560px) {
 				.posts a {
