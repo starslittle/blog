@@ -107,7 +107,6 @@ const seriesIds = (Object.keys(SERIES) as SeriesId[]).filter((id) =>
 				font-size: 1.3rem;
 				font-weight: 600;
 				line-height: 1.45;
-				transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
 			}
 			.pdesc {
 				grid-column: 2;
@@ -150,8 +149,9 @@ const seriesIds = (Object.keys(SERIES) as SeriesId[]).filter((id) =>
 			.posts a:hover .day {
 				color: var(--accent);
 			}
+			/* No slide on hover: moving text gets redrawn when it stops and looks like
+			   it flashes darker. The red underline and number carry the hover state. */
 			.posts a:hover .ptitle {
-				transform: translateX(0.4rem);
 				color: var(--ink);
 			}
 			@media (max-width: 560px) {
