@@ -59,6 +59,35 @@ const openSource = [
 				color: var(--ink-soft);
 			}
 
+			/* Two mottos, set large, each with a short red mark */
+			.mottos {
+				margin-top: 2.75rem;
+			}
+			.mottos ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				display: grid;
+				gap: 0.9rem;
+			}
+			.mottos li {
+				position: relative;
+				padding-left: 1.4rem;
+				font-family: var(--font-serif);
+				font-size: clamp(1.3rem, 3vw, 1.65rem);
+				font-weight: 600;
+				line-height: 1.5;
+				letter-spacing: 0.02em;
+			}
+			.mottos li::before {
+				content: '';
+				position: absolute;
+				left: 0;
+				top: 0.35em;
+				bottom: 0.35em;
+				width: 3px;
+				background: var(--accent);
+			}
 			.block {
 				margin-top: 3.5rem;
 				max-width: var(--measure);
@@ -210,6 +239,14 @@ const openSource = [
 				<p class="hello">你好，我是 Tao。</p>
 				<p class="role">做 AI 应用开发，也写全栈。</p>
 			</PaperHero>
+
+			<section class="mottos" aria-labelledby="mottos-title">
+				<p class="eyebrow" id="mottos-title">座右铭</p>
+				<ul>
+					<li>向别人看，跟自己比。</li>
+					<li>有留住运气的实力。</li>
+				</ul>
+			</section>
 
 			<div class="cols">
 				<section class="block">
