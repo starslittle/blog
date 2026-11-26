@@ -2,8 +2,8 @@
 title: '钱是用来换选择权的'
 description: '快要工作了，我想先把自己的金钱观理清楚：钱到底是什么，为什么在 AI 时代更要早点攒，该花在哪里，以及给自己定的几条规矩。'
 pubDate: '2026-11-22'
-series: growth
-seriesOrder: 4
+# series: growth
+# seriesOrder: 4
 ---
 
 快要正式工作了，第一份工资还没拿到，我想先把一件事想清楚：我该怎么看待钱。

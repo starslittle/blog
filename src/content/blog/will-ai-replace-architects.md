@@ -2,8 +2,8 @@
 title: '架构师会被 AI 替代吗？我试着算了一下时间'
 description: 'AI 的能力在指数增长，架构师这个岗位还能撑多久？我把它拆成三个走得不一样快的时钟，给了自己一个大致的时间表，也想清楚了接下来该押注什么。'
 pubDate: '2026-11-22'
-series: growth
-seriesOrder: 3
+# series: growth
+# seriesOrder: 3
 ---
 
 写完[上一篇](/blog/substance-in-the-ai-era/)，我又往前多想了一步：如果连写代码都越来越多地交给 AI，那再往上走，架构师会不会也被替代？

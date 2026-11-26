@@ -2,8 +2,8 @@
 title: '背书能敲开门，内蕴才能走远'
 description: '秋招没拿到大厂 offer，又听一位长辈讲了一路走来的经历，我对“背书”和“能力”的看法变了。'
 pubDate: '2026-11-21'
-series: growth
-seriesOrder: 1
+# series: growth
+# seriesOrder: 1
 ---
 
 以前我一直觉得，大厂背书很重要。简历上有一个响亮的公司名，别人一眼就会高看你；进了大厂，好像才算证明了自己。

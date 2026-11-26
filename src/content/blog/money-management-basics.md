@@ -2,8 +2,8 @@
 title: '理财之前，先问这笔钱什么时候要用'
 description: '上一篇想的是钱对我意味着什么，这一篇想的是钱该怎么管。我给自己整理了几条理财原则：按用途分钱、收益和风险绑在一起、分散、长期、自己做决定，以及最难的那条，管住自己。'
 pubDate: '2026-11-22'
-series: growth
-seriesOrder: 5
+# series: growth
+# seriesOrder: 5
 ---
 
 [上一篇](/blog/money-buys-choices/)想的是"钱对我意味着什么"。这一篇想接着想另一个问题：钱该怎么管。

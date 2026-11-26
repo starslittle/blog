@@ -6,10 +6,12 @@ export const SITE_DESCRIPTION = '想到什么写什么：工作、技术和生�
 
 // Post series. A post joins one with `series: <id>` and `seriesOrder: <n>` in its frontmatter.
 export const SERIES = {
-	growth: {
-		title: '成长',
-		description: '秋招之后，关于背书、能力，以及 AI 时代该怎么成长的一些想法。',
-	},
+	// Temporarily hidden. To bring it back, uncomment this block and the
+	// `series: growth` / `seriesOrder` lines in the five growth posts.
+	// growth: {
+	// 	title: '成长',
+	// 	description: '秋招之后，关于背书、能力，以及 AI 时代该怎么成长的一些想法。',
+	// },
 	future: {
 		title: '未来视野',
 		description: 'AI 和机器人越来越强以后，哪些工作会更值钱，哪些会被替代。',
